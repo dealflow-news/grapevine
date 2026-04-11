@@ -180,7 +180,11 @@ ${(source.body_md ?? '').slice(0, 2000)}`;
       const end     = cleaned.lastIndexOf('}') + 1;
       extracted     = JSON.parse(cleaned.slice(start, end));
     } catch (e: any) {
-      return json({ error: `Anthropic call failed: ${e.message}` }, 500);
+      const msg = e.message || '';
+      if (msg.includes('usage limit') || msg.includes('rate limit') || msg.includes('429')) {
+        return json({ error: 'API usage limit reached — extraction temporarily unavailable. Check console.anthropic.com.' }, 503);
+      }
+      return json({ error: `Anthropic call failed: ${msg}` }, 500);
     }
 
     // Validate required keys

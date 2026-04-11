@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grapevine — Intelligence OS</title>
 <style>
@@ -830,6 +832,7 @@ function listItemHTML(n){
     </div>
     <div class="list-item-title">${n.title||'(untitled)'}</div>
     <div class="list-item-pills">
+      ${(n.structured_data||{}).pattern_candidate?badge('◉','var(--gold-txt)','var(--gold-dim)'):''}
       ${n.geo_country?pill(n.geo_country):''}
       ${n.sector_code?pill(n.sector_code):''}
       ${confBadge(n.confidence)}
@@ -967,7 +970,13 @@ async function extractCard(noteId) {
     const data = await r.json();
 
     if (!r.ok || data.error) {
-      showToast('✗ Extract failed: ' + (data.error || r.status), 'error');
+      const errMsg = data.error || r.status;
+      // Friendly message for API rate limit
+      if (typeof errMsg === 'string' && errMsg.includes('usage limit')) {
+        showToast('⚠ AI extraction unavailable — API usage limit reached. Try again later or visit console.anthropic.com.', 'error');
+      } else {
+        showToast('✗ Extract failed: ' + errMsg, 'error');
+      }
       return;
     }
 
