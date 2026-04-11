@@ -1768,13 +1768,51 @@ async function confirmDelete() {
   }
 }
 // ═══════════════════════════════════════════════════════════════
+
+// ── Deep link handler (?note=<uuid> from Ticker bridge) ──────
+function focusNoteById(noteId) {
+  if (!noteId) return;
+  const n = state.notes.find(x => x.note_id === noteId);
+  if (!n) { showToast('Note not found — may have been deleted', 'warn'); return; }
+  // Switch to correct filter
+  const filterMap = { draft: 'draft', active: 'active', archived: 'archived' };
+  const f = filterMap[n.status] || 'draft';
+  setCurateFilter(f);
+  // Select + open detail
+  state.selectedCurateId = noteId;
+  renderCurateList();
+  selectCurate(noteId);
+  // Scroll item into view
+  setTimeout(() => {
+    const el = document.querySelector(`[onclick*="${noteId}"]`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+function handleUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const urlNote = params.get('note');
+  const urlFilter = params.get('filter'); // 'drafts' | 'candidates' | 'active'
+  if (urlNote) {
+    switchTab('curate');
+    focusNoteById(urlNote);
+  } else if (urlFilter) {
+    switchTab('curate');
+    const filterMap = { drafts: 'draft', active: 'active', archived: 'archived', candidates: 'candidates' };
+    setCurateFilter(filterMap[urlFilter] || 'draft');
+  }
+  // Clean URL without reloading
+  if (urlNote || urlFilter) {
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+}
 // INIT
 // ═══════════════════════════════════════════════════════════════
 initPulseCounts();
 renderPulseList();
 renderKB();
 if(KEY){
-  loadAll();
+  loadAll().then(() => handleUrlParams());
 } else {
   // Offline demo mode — show empty states
   updateStats();
