@@ -1844,15 +1844,16 @@ if(KEY){
 }
 
 async function openStorageDoc(path){
+  const SUPABASE_BASE = URL_BASE.replace('/rest/v1','');
   try{
-    const res = await fetch(`${SB}/storage/v1/object/sign/grapevine-docs/${path}`, {
+    const res = await fetch(`${SUPABASE_BASE}/storage/v1/object/sign/grapevine-docs/${path}`, {
       method:'POST',
       headers:{...H,'Content-Type':'application/json'},
       body: JSON.stringify({expiresIn: 3600})
     });
     const data = await res.json();
     if(data.signedURL){
-      window.open(SB + '/storage/v1' + data.signedURL, '_blank');
+      window.open(`${SUPABASE_BASE}/storage/v1${data.signedURL}`, '_blank');
     } else {
       showToast('Could not generate document link','warn');
     }
