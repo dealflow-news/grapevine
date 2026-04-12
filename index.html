@@ -1842,6 +1842,26 @@ if(KEY){
   document.getElementById('stat-cards').textContent='—';
   showToast('No Supabase key — offline mode. Add key to CONFIG block.','warn');
 }
+
+async function openStorageDoc(path){
+  try{
+    const res = await fetch(`${SB}/storage/v1/object/sign/grapevine-docs/${path}`, {
+      method:'POST',
+      headers:{...H,'Content-Type':'application/json'},
+      body: JSON.stringify({expiresIn: 3600})
+    });
+    const data = await res.json();
+    if(data.signedURL){
+      window.open(SB + '/storage/v1' + data.signedURL, '_blank');
+    } else {
+      showToast('Could not generate document link','warn');
+    }
+  } catch(e){
+    showToast('Document not available','warn');
+    console.warn('openStorageDoc error',e);
+  }
+}
+
 </script>
 
 <!-- Delete Confirmation Modal -->
