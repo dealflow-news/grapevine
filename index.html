@@ -1848,7 +1848,7 @@ async function openStorageDoc(path){
   try{
     const res = await fetch(`${SUPABASE_BASE}/storage/v1/object/sign/grapevine-docs/${path}`, {
       method:'POST',
-      headers:{...H,'Content-Type':'application/json'},
+      headers:{ apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({expiresIn: 3600})
     });
     const data = await res.json();
