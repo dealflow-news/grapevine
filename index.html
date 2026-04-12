@@ -917,8 +917,7 @@ function showCurateDetail(n){
   }
 
   // Provenance
-  html+=`<div class="section">${sl('Provenance')}`
-    <div style="font-size:11px;color:var(--faint);font-family:var(--mono);line-height:1.8">
+  html+=`<div class="section">${sl('Provenance')}<div style="font-size:11px;color:var(--faint);font-family:var(--mono);line-height:1.8">
       ${n.derived_from&&n.derived_from.length?'<span style="color:var(--blue)">⬤ AI-derived</span> · ':''}
       capture_origin: ${n.capture_origin||'—'} ·
       intended_audience: ${n.intended_audience||'—'} ·
