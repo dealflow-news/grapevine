@@ -1845,22 +1845,8 @@ if(KEY){
 
 async function openStorageDoc(path){
   const SUPABASE_BASE = URL_BASE.replace('/rest/v1','');
-  try{
-    const res = await fetch(`${SUPABASE_BASE}/storage/v1/object/sign/grapevine-docs/${path}`, {
-      method:'POST',
-      headers:{ apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({expiresIn: 3600})
-    });
-    const data = await res.json();
-    if(data.signedURL){
-      window.open(`${SUPABASE_BASE}/storage/v1${data.signedURL}`, '_blank');
-    } else {
-      showToast('Could not generate document link','warn');
-    }
-  } catch(e){
-    showToast('Document not available','warn');
-    console.warn('openStorageDoc error',e);
-  }
+  const url = `${SUPABASE_BASE}/storage/v1/object/public/grapevine-docs/${path}`;
+  window.open(url, '_blank');
 }
 
 </script>
