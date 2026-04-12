@@ -905,8 +905,19 @@ function showCurateDetail(n){
   // Source box
   if(sd.source_box) html+=`<div class="section">${sl('Source Box')}<div style="background:var(--bg-code);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--muted);font-family:var(--mono);white-space:pre-wrap">${sd.source_box.slice(0,400)}</div></div>`;
 
+  // Document link (storage_url)
+  if(sd.storage_url){
+    const fname = sd.file_reference || sd.storage_url.split('/').pop();
+    html+=`<div class="section">${sl('Document')}<div style="margin-top:4px">
+      <a href="#" onclick="openStorageDoc('${sd.storage_url}');return false;"
+         style="display:inline-flex;align-items:center;gap:6px;color:var(--brand);font-size:12px;font-family:var(--mono);text-decoration:none;border:1px solid var(--brand-border);border-radius:4px;padding:4px 10px;background:var(--bg-code)">
+        📄 ${fname}
+      </a>
+    </div></div>`;
+  }
+
   // Provenance
-  html+=`<div class="section">${sl('Provenance')}
+  html+=`<div class="section">${sl('Provenance')}`
     <div style="font-size:11px;color:var(--faint);font-family:var(--mono);line-height:1.8">
       ${n.derived_from&&n.derived_from.length?'<span style="color:var(--blue)">⬤ AI-derived</span> · ':''}
       capture_origin: ${n.capture_origin||'—'} ·
