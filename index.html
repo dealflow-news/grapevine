@@ -1725,7 +1725,7 @@ async function ingestAll(){
         sector_code:      q.sector||null,
         geo_country:      q.country||null,
         title:            q.title,
-        body_md:          q.text||null,
+        body:          q.text||null,
         summary_short:    q.text?q.text.slice(0,300):null,
         language_code:    'en',
         is_ai_derived:    false,
