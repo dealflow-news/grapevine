@@ -693,7 +693,7 @@ async function loadAll() {
   showLoading('curate-list');
   try {
     const notes = await sbGet('grapevine_notes', {
-      select: 'note_id,note_type,status,title,body_md,summary_short,confidence,geo_country,sector_code,source_type,source_family,freshness_date,time_sensitivity,sensitivity_level,visibility_scope,intended_audience,review_status,link_status,capture_origin,is_deleted,structured_data,created_at,updated_at,derived_from,content_kind,language_code',
+      select: 'note_id,note_type,status,title,body,body_md,summary_short,confidence,geo_country,sector_code,source_type,source_family,freshness_date,time_sensitivity,sensitivity_level,visibility_scope,intended_audience,review_status,link_status,capture_origin,is_deleted,structured_data,created_at,updated_at,derived_from,content_kind,language_code',
       'is_deleted': 'eq.false',
       order: 'created_at.desc',
       limit: '500',
@@ -876,9 +876,10 @@ function showCurateDetail(n){
     </div>
     <div class="divider"></div>`;
 
-  // Body — full body_md first, fallback to summary
-  if(n.body_md){
-    html+=`<div class="section">${sl('Intelligence')}<div class="section-body" style="font-size:13px;line-height:1.8">${renderMd(n.body_md.replace(/\\n/g,'\n').slice(0,3000))}${n.body_md.length>3000?'…':''}</div></div>`;
+  // Body — body (drop_point) first, body_md (intel_capture) fallback, then summary
+  const bodyContent = n.body || n.body_md;
+  if(bodyContent){
+    html+=`<div class="section">${sl('Intelligence')}<div class="section-body" style="font-size:13px;line-height:1.8">${renderMd(bodyContent.replace(/\\n/g,'\n').slice(0,3000))}${bodyContent.length>3000?'…':''}</div></div>`;
   } else if(n.summary_short){
     html+=`<div class="section">${sl('Summary')}<div class="section-body">${n.summary_short}</div></div>`;
   }
@@ -1317,7 +1318,7 @@ function selectMandate(id){
     html+=`<div class="section">${sl('◈ RELEVANT GRAPEVINE SIGNALS','var(--amber)')}`;
     matchW.forEach(n=>{html+=`<div class="intel-signal">
       <div class="intel-signal-title">${n.title}</div>
-      <div class="intel-signal-body">${truncate(n.summary_short||n.body_md||'',150)}</div>
+      <div class="intel-signal-body">${truncate(n.summary_short||n.body||n.body_md||'',150)}</div>
       <div style="margin-top:8px;display:flex;gap:6px">${confBadge(n.confidence)}<span style="font-size:10px;color:var(--faint);font-family:var(--mono)">${timeAgo(n.created_at)}</span></div>
     </div>`;});
     html+='</div>';
@@ -1721,11 +1722,11 @@ async function ingestAll(){
         visibility_scope: 'TEAM',
         intended_audience:q.intended_audience,
         time_sensitivity: q.time_sensitivity,
-        confidence:       q.confidence,
         sector_code:      q.sector||null,
         geo_country:      q.country||null,
         title:            q.title,
-        body:          q.text||'',
+        body:             q.text||'',
+        body_md:          q.text||'',
         summary_short:    q.text?q.text.slice(0,300):null,
         language_code:    'en',
         is_ai_derived:    false,
@@ -1736,9 +1737,10 @@ async function ingestAll(){
         file_checksum:        q.file_hash||null,
         content_fingerprint_hash: contentHash,
         structured_data:{
-          source_box: q.url||q.source||null,
+          source_box:      q.url||q.source||null,
           source_language: 'en',
-          drop_source: q.source||null,
+          drop_source:     q.source||null,
+          confidence:      q.confidence||null,
         },
       };
       await sbPost('grapevine_notes',note);
