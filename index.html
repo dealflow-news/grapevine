@@ -216,7 +216,12 @@ nav{padding:14px 0;flex:1;}
 .queue-ingest-all:hover{background:var(--sage-dim);}
 .queue-empty{color:var(--faint);font-size:12px;font-family:var(--mono);text-align:center;padding:24px 0;}
 
-/* Promote Modal */
+/* KB view tabs */
+.kb-view-btn{padding:4px 11px;border-radius:4px;border:1px solid var(--border);font-size:10px;letter-spacing:.3px;text-transform:uppercase;font-family:var(--mono);cursor:pointer;background:transparent;color:var(--muted);transition:all .15s;outline:none;}
+.kb-view-btn:hover{border-color:var(--muted);}
+.kb-view-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-txt);}
+
+/* Tier badges */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
 .modal-backdrop.open{display:flex;}
 .modal{background:var(--bg-e);border:1px solid var(--border);border-radius:12px;padding:26px;width:440px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.4);}
@@ -351,6 +356,20 @@ nav{padding:14px 0;flex:1;}
           <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:10px;">
             <input type="checkbox" id="kb-show-archived" onchange="renderKB()"> Include archived
           </label>
+        </div>
+        <!-- D.2 — View tabs: All / Library / Patterns / Standards -->
+        <div style="display:flex;gap:3px;padding:8px 18px;border-bottom:1px solid var(--border);background:var(--bg-e);flex-shrink:0;">
+          <button id="kbv-all"      class="kb-view-btn active" onclick="setKBView('all')">All <span id="kbvc-all"     class="status-count">0</span></button>
+          <button id="kbv-library"  class="kb-view-btn"        onclick="setKBView('library')">◉ Library <span id="kbvc-library"  class="status-count">0</span></button>
+          <button id="kbv-patterns" class="kb-view-btn"        onclick="setKBView('patterns')">◈ Patterns <span id="kbvc-patterns" class="status-count">0</span></button>
+          <button id="kbv-standards"class="kb-view-btn"        onclick="setKBView('standards')">▣ Standards <span id="kbvc-standards" class="status-count">0</span></button>
+          <div style="margin-left:auto;display:flex;gap:4px;align-items:center;">
+            <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em">Regional Fit</span>
+            <button id="kbf-all"       class="kb-view-btn active" onclick="setKBFit('all')"       style="font-size:9px;padding:3px 8px">All</button>
+            <button id="kbf-direct"    class="kb-view-btn"        onclick="setKBFit('direct')"    style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">🎯 Direct</button>
+            <button id="kbf-analogous" class="kb-view-btn"        onclick="setKBFit('analogous')" style="font-size:9px;padding:3px 8px">EU applicable</button>
+            <button id="kbf-background"class="kb-view-btn"        onclick="setKBFit('background')" style="font-size:9px;padding:3px 8px;color:var(--faint)">Background</button>
+          </div>
         </div>
         <div style="display:flex;flex:1;overflow:hidden;">
           <div id="kb-grid-wrap" style="width:420px;min-width:320px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);"><div class="kb-grid" id="kb-grid"></div></div>
@@ -682,6 +701,8 @@ const state = {
   dropFileHash: null,
   dropUrlHash: null,
   dropNoteType: 'KNOWLEDGE_CARD',
+  kbView: 'all',    // all | library | patterns | standards
+  kbFit:  'all',    // all | direct | analogous | background
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -693,7 +714,7 @@ async function loadAll() {
   showLoading('curate-list');
   try {
     const notes = await sbGet('grapevine_notes', {
-      select: 'note_id,note_type,status,title,body,body_md,summary_short,confidence,geo_country,sector_code,source_type,source_family,freshness_date,time_sensitivity,sensitivity_level,visibility_scope,intended_audience,review_status,link_status,capture_origin,is_deleted,structured_data,created_at,updated_at,derived_from,content_kind,language_code',
+      select: 'note_id,note_type,status,title,body_md,summary_short,confidence,geo_country,sector_code,source_type,source_family,freshness_date,time_sensitivity,sensitivity_level,visibility_scope,intended_audience,review_status,link_status,capture_origin,is_deleted,structured_data,created_at,updated_at,derived_from,content_kind,language_code',
       'is_deleted': 'eq.false',
       order: 'created_at.desc',
       limit: '500',
@@ -876,10 +897,9 @@ function showCurateDetail(n){
     </div>
     <div class="divider"></div>`;
 
-  // Body — body (drop_point) first, body_md (intel_capture) fallback, then summary
-  const bodyContent = n.body || n.body_md;
-  if(bodyContent){
-    html+=`<div class="section">${sl('Intelligence')}<div class="section-body" style="font-size:13px;line-height:1.8">${renderMd(bodyContent.replace(/\\n/g,'\n').slice(0,3000))}${bodyContent.length>3000?'…':''}</div></div>`;
+  // Body — full body_md first, fallback to summary
+  if(n.body_md){
+    html+=`<div class="section">${sl('Intelligence')}<div class="section-body" style="font-size:13px;line-height:1.8">${renderMd(n.body_md.replace(/\\n/g,'\n').slice(0,3000))}${n.body_md.length>3000?'…':''}</div></div>`;
   } else if(n.summary_short){
     html+=`<div class="section">${sl('Summary')}<div class="section-body">${n.summary_short}</div></div>`;
   }
@@ -1318,7 +1338,7 @@ function selectMandate(id){
     html+=`<div class="section">${sl('◈ RELEVANT GRAPEVINE SIGNALS','var(--amber)')}`;
     matchW.forEach(n=>{html+=`<div class="intel-signal">
       <div class="intel-signal-title">${n.title}</div>
-      <div class="intel-signal-body">${truncate(n.summary_short||n.body||n.body_md||'',150)}</div>
+      <div class="intel-signal-body">${truncate(n.summary_short||n.body_md||'',150)}</div>
       <div style="margin-top:8px;display:flex;gap:6px">${confBadge(n.confidence)}<span style="font-size:10px;color:var(--faint);font-family:var(--mono)">${timeAgo(n.created_at)}</span></div>
     </div>`;});
     html+='</div>';
@@ -1339,6 +1359,7 @@ function selectMandate(id){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // KNOWLEDGE BASE
 // ═══════════════════════════════════════════════════════════════
 function closeKBDetail(){
@@ -1349,44 +1370,101 @@ function closeKBDetail(){
   if(kg) kg.style.gridTemplateColumns='';
 }
 
+function setKBView(v){
+  state.kbView=v;
+  ['all','library','patterns','standards'].forEach(x=>{
+    document.getElementById(`kbv-${x}`)?.classList.toggle('active',x===v);
+  });
+  closeKBDetail();
+  renderKB();
+}
+
+function setKBFit(f){
+  state.kbFit=f;
+  ['all','direct','analogous','background'].forEach(x=>{
+    document.getElementById(`kbf-${x}`)?.classList.toggle('active',x===f);
+  });
+  renderKB();
+}
+
+// Tier badge — A/B/C
+function tierBadge(tier){
+  if(!tier) return '';
+  const cfg={A:{c:'var(--sage-txt)',b:'var(--sage-dim)'},B:{c:'var(--gold-txt)',b:'var(--gold-dim)'},C:{c:'var(--faint)',b:'var(--bg-code)'}};
+  const {c,b}=cfg[tier]||{c:'var(--faint)',b:'var(--bg-code)'};
+  return badge(`Tier ${tier}`,c,b);
+}
+
+// Regional fit label — human readable
+function fitLabel(fit){
+  if(!fit) return '';
+  const map={direct:'🎯 Benelux/FR direct',analogous:'EU applicable',background:'Background'};
+  const col={direct:'var(--sage-txt)',analogous:'var(--muted)',background:'var(--faint)'};
+  return `<span class="badge" style="color:${col[fit]||'var(--faint)'};background:var(--bg-r);border:1px solid var(--border)">${map[fit]||fit}</span>`;
+}
+
 function renderKB(){
   const q=(document.getElementById('kb-input').value||'').toLowerCase().trim();
   const showDrafts=document.getElementById('kb-show-drafts').checked;
   const showArchived=document.getElementById('kb-show-archived').checked;
+  const view=state.kbView||'all';
+  const fit=state.kbFit||'all';
 
   const matchQ = n => {
     if(q.length<2) return true;
     const sd=n.structured_data||{};
-    return n.title.toLowerCase().includes(q)||
+    return (n.title||'').toLowerCase().includes(q)||
       (sd.core_insight||'').toLowerCase().includes(q)||
       (sd.best_use||[]).some(b=>b.toLowerCase().includes(q))||
-      (n.sector_code||'').toLowerCase().includes(q);
+      (n.sector_code||'').toLowerCase().includes(q)||
+      (sd.source_access?.author||'').toLowerCase().includes(q);
   };
 
-  // Active: shown unless drafts mode is on
-  const activeCards   = !showDrafts ? state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='active'&&!n.is_deleted&&matchQ(n)) : [];
-  // Drafts: shown only when toggle on (replaces active view)
-  const draftCards    = showDrafts   ? state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='draft'  &&!n.is_deleted&&matchQ(n)) : [];
-  // Archived only when toggle on
-  const archivedCards = showArchived ? state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='archived'&&!n.is_deleted&&matchQ(n)) : [];
+  const matchView = n => {
+    const ct=(n.structured_data||{}).card_type||'';
+    if(view==='library')  return ct==='library_source';
+    if(view==='patterns') return ct==='pattern';
+    if(view==='standards')return ct==='standard';
+    return true;
+  };
+
+  const matchFit = n => {
+    if(fit==='all') return true;
+    return ((n.structured_data||{}).kb_quality?.benelux_fit||'')=== fit;
+  };
+
+  const base = n => n.note_type==='KNOWLEDGE_CARD'&&!n.is_deleted&&matchQ(n)&&matchView(n)&&matchFit(n);
+  const activeCards   = !showDrafts ? state.notes.filter(n=>base(n)&&n.status==='active')   : [];
+  const draftCards    = showDrafts  ? state.notes.filter(n=>base(n)&&n.status==='draft')    : [];
+  const archivedCards = showArchived? state.notes.filter(n=>base(n)&&n.status==='archived') : [];
+
+  // Update view tab counts (all active, no filters except view)
+  const allKC = state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='active'&&!n.is_deleted);
+  document.getElementById('kbvc-all'     )?.textContent=allKC.length;
+  document.getElementById('kbvc-library' )?.textContent=allKC.filter(n=>(n.structured_data||{}).card_type==='library_source').length;
+  document.getElementById('kbvc-patterns')?.textContent=allKC.filter(n=>(n.structured_data||{}).card_type==='pattern').length;
+  document.getElementById('kbvc-standards')?.textContent=allKC.filter(n=>(n.structured_data||{}).card_type==='standard').length;
 
   const total = activeCards.length + draftCards.length + archivedCards.length;
   document.getElementById('kb-count').textContent=`${total} card${total!==1?'s':''}`;
 
-  // Build sections
   const renderCard = c => {
     const sd=c.structured_data||{};
     const sel=state.selectedKBId===c.note_id;
+    const tier=(sd.kb_quality||{}).tier;
+    const fit=(sd.kb_quality||{}).benelux_fit;
+    const ct=sd.card_type||'';
+    const ctIcon=ct==='pattern'?'◈ ':ct==='standard'?'▣ ':'';
     return `<div class="kb-card${sel?' selected':''}" tabindex="0" onclick="selectKB('${c.note_id}')" onkeydown="if(event.key==='Enter'||event.key===' ')selectKB('${c.note_id}')">
-      <div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap">
-        ${badge(c.status==='active'?'◉ Active':c.status==='archived'?'📁 Archived':'◈ Draft',c.status==='active'?'var(--sage-txt)':c.status==='archived'?'var(--faint)':'var(--gold-txt)',c.status==='active'?'var(--sage-dim)':c.status==='archived'?'var(--bg-code)':'var(--gold-dim)')}
+      <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+        ${tier?tierBadge(tier):''}
         ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
-        ${confBadge(c.confidence)}
+        ${fit&&fit!=='background'?fitLabel(fit):''}
       </div>
-      <div class="kb-card-title">${c.title||'(untitled)'}</div>
+      <div class="kb-card-title">${ctIcon}${c.title||'(untitled)'}</div>
       <div class="kb-card-excerpt">${truncate(sd.core_insight||c.summary_short||'',110)}</div>
-      ${sd.storage_url?`<div style="margin-top:6px"><span style="font-size:10px;color:var(--brand);font-family:var(--mono);background:var(--bg-code);border:1px solid var(--brand-border);border-radius:3px;padding:2px 6px">📄 doc</span></div>`:''}
-      <div style="display:flex;gap:4px;flex-wrap:wrap">${(sd.best_use||[]).map(u=>pill(u)).join('')}</div>
+      ${sd.storage_url||sd.source_access?.storage_url?`<div style="margin-top:4px"><span style="font-size:10px;color:var(--accent);font-family:var(--mono);background:var(--bg-code);border:1px solid var(--accent-dim);border-radius:3px;padding:2px 6px">📄 doc</span></div>`:''}
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${(sd.best_use||[]).slice(0,3).map(u=>pill(u)).join('')}</div>
     </div>`;
   };
 
@@ -1395,7 +1473,6 @@ function renderKB(){
     grid.innerHTML=`<div class="kb-empty"><div style="font-size:28px;margin-bottom:12px">◈</div>No results${q?` for "${q}"`:''}.</div>`;
     return;
   }
-
   let html='';
   if(draftCards.length){
     html+=`<div style="font-size:8px;letter-spacing:3px;color:var(--gold);font-family:var(--mono);text-transform:uppercase;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px">◈ Drafts — review &amp; promote</div>`;
@@ -1419,41 +1496,39 @@ function selectKB(id){
   const c=state.notes.find(x=>x.note_id===id);
   if(!c)return;
   const sd=c.structured_data||{};
+  const sa=sd.source_access||{};
+  const kbq=sd.kb_quality||{};
   kd.classList.add('open');
   if(kgrid)kgrid.style.gridTemplateColumns='1fr';
+  const hasSource=sa.canonical_url||sa.isbn||sa.author||sd.source_box;
+  const sourceBlock=hasSource?`<div class="section">${sl('Source')}
+    <div style="background:var(--bg-code);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:11px;font-family:var(--mono);line-height:2">
+      ${sa.author?`<div><span style="color:var(--faint);display:inline-block;width:60px">Author</span><span style="color:var(--txt)">${sa.author}</span></div>`:''}
+      ${sa.isbn?`<div><span style="color:var(--faint);display:inline-block;width:60px">ISBN</span><span style="color:var(--muted)">${sa.isbn}</span></div>`:''}
+      ${sd.source_box?`<div style="margin-top:4px;color:var(--muted);font-size:10px;line-height:1.6">${sd.source_box.slice(0,250)}</div>`:''}
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        ${sa.canonical_url?`<a href="${sa.canonical_url}" target="_blank" rel="noopener" style="color:var(--accent);font-size:10px;text-decoration:none;border:1px solid var(--accent-dim);border-radius:3px;padding:2px 8px">🔗 Open source ↗</a>`:''}
+        ${(sd.storage_url||sa.storage_url)?`<a href="#" onclick="openStorageDoc('${sd.storage_url||sa.storage_url}');return false;" style="color:var(--accent);font-size:10px;text-decoration:none;border:1px solid var(--accent-dim);border-radius:3px;padding:2px 8px">📄 Open document</a>`:''}
+      </div>
+    </div></div>`:'';
   kd.innerHTML=`
     <div class="kb-detail-body">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div class="section-label">Knowledge Card</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="section-label">${sd.card_type==='pattern'?'Pattern Card':sd.card_type==='standard'?'Standard':'Library Source'}</div>
         <button class="kb-close" onclick="selectKB('${id}')">×</button>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">
+        ${kbq.tier?tierBadge(kbq.tier):''}
+        ${kbq.benelux_fit?fitLabel(kbq.benelux_fit):''}
+        ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
+        ${confBadge(c.confidence)}
       </div>
       <div style="font-size:15px;font-weight:700;color:var(--txt);line-height:1.4;margin-bottom:16px">${c.title}</div>
       ${sd.core_insight?`<div class="section">${sl('Core Insight')}<div class="insight-block">${sd.core_insight}</div></div>`:''}
       ${sd.deal_implication?`<div class="section">${sl('Deal Implication')}<div style="font-size:12px;color:var(--muted);line-height:1.65">${sd.deal_implication}</div></div>`:''}
       ${sd.misread_risk?`<div class="section">${sl('⚠ Misread Risk','var(--amber)')}<div class="warning-block">${sd.misread_risk}</div></div>`:''}
       ${sd.best_use&&sd.best_use.length?`<div class="section">${sl('Best Use')}<div class="pill-row">${sd.best_use.map(u=>pill(u)).join('')}</div></div>`:''}
-
-      ${(()=>{
-        const sa = sd.source_access || {};
-        const hasSource = sa.canonical_url || sa.isbn || sa.author || sd.source_box;
-        if(!hasSource) return '';
-        return `<div class="section">${sl('Source')}
-          <div style="background:var(--bg-code);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:11px;font-family:var(--mono);line-height:1.9">
-            ${sa.author?`<div><span style="color:var(--faint)">Author</span>&nbsp;&nbsp;<span style="color:var(--txt)">${sa.author}</span></div>`:''}
-            ${sa.isbn?`<div><span style="color:var(--faint)">ISBN&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;<span style="color:var(--muted)">${sa.isbn}</span></div>`:''}
-            ${sd.source_box?`<div style="margin-top:4px;color:var(--muted);font-size:10px">${sd.source_box.slice(0,200)}</div>`:''}
-            ${sa.canonical_url?`<div style="margin-top:6px"><a href="${sa.canonical_url}" target="_blank" rel="noopener" style="color:var(--brand);font-size:10px;text-decoration:none">🔗 Open source ↗</a></div>`:''}
-            ${sd.storage_url||sa.storage_url?`<a href="#" onclick="openStorageDoc('${sd.storage_url||sa.storage_url}');return false;" style="display:inline-block;margin-top:4px;color:var(--brand);font-size:10px;font-family:var(--mono);text-decoration:none">📄 Open document</a>`:''}
-          </div>
-        </div>`;
-      })()}
-
-      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:12px">
-        ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
-        ${sd.kb_quality&&sd.kb_quality.tier?badge('Tier '+sd.kb_quality.tier, sd.kb_quality.tier==='A'?'var(--sage-txt)':sd.kb_quality.tier==='B'?'var(--gold)':'var(--muted)', sd.kb_quality.tier==='A'?'var(--sage-dim)':sd.kb_quality.tier==='B'?'var(--gold-dim)':'var(--bg-code)'):''}
-        ${sd.kb_quality&&sd.kb_quality.benelux_fit?badge(sd.kb_quality.benelux_fit==='direct'?'🎯 direct':sd.kb_quality.benelux_fit==='analogous'?'↔ analogous':'○ background','var(--faint)','var(--bg-code)'):''}
-        ${confBadge(c.confidence)}
-      </div>
+      ${sourceBlock}
     </div>
     <div class="kb-detail-footer"><div class="actions">
       ${c.status==='draft'?`
@@ -1475,12 +1550,35 @@ function openKBEditMode(id){
   const c = state.notes.find(x=>x.note_id===id);
   if(!c) return;
   const kd = document.getElementById('kb-detail');
+  const sd = c.structured_data||{};
+  const sa = sd.source_access||{};
+  const kbq= sd.kb_quality||{};
   const body = `<div class="kb-detail-body">
     <div style="font-size:11px;letter-spacing:2px;color:var(--accent);font-family:var(--mono);margin-bottom:18px;text-transform:uppercase;">✎ Edit Card</div>
     <div class="edit-form">
       <div class="edit-field">
         <label class="edit-label">Title</label>
         <input class="edit-input" id="kbef-title" value="${(c.title||'').replace(/"/g,'&quot;')}">
+      </div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Tier</label>
+          <select class="edit-select" id="kbef-tier">
+            <option value=""  ${!kbq.tier?'selected':''}>— select —</option>
+            <option value="A" ${kbq.tier==='A'?'selected':''}>A — Frontline use</option>
+            <option value="B" ${kbq.tier==='B'?'selected':''}>B — Background</option>
+            <option value="C" ${kbq.tier==='C'?'selected':''}>C — Archive candidate</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Regional Fit — BE/NL/LU/FR</label>
+          <select class="edit-select" id="kbef-fit">
+            <option value=""           ${!kbq.benelux_fit?'selected':''}>— select —</option>
+            <option value="direct"     ${kbq.benelux_fit==='direct'    ?'selected':''}>🎯 Benelux/FR direct</option>
+            <option value="analogous"  ${kbq.benelux_fit==='analogous' ?'selected':''}>EU applicable</option>
+            <option value="background" ${kbq.benelux_fit==='background'?'selected':''}>Background context</option>
+          </select>
+        </div>
       </div>
       <div class="edit-row">
         <div class="edit-field">
@@ -1493,19 +1591,20 @@ function openKBEditMode(id){
           </select>
         </div>
         <div class="edit-field">
-          <label class="edit-label">Sensitivity</label>
-          <select class="edit-select" id="kbef-sensitivity">
-            <option value="PUBLIC"       ${c.sensitivity_level==='PUBLIC'       ?'selected':''}>PUBLIC</option>
-            <option value="CLIENTSAFE"   ${c.sensitivity_level==='CLIENTSAFE'   ?'selected':''}>CLIENTSAFE</option>
-            <option value="INTERNALONLY" ${c.sensitivity_level==='INTERNALONLY' ?'selected':''}>INTERNALONLY</option>
-            <option value="RESTRICTED"   ${c.sensitivity_level==='RESTRICTED'   ?'selected':''}>RESTRICTED</option>
-          </select>
+          <label class="edit-label">Sector</label>
+          <input class="edit-input" id="kbef-sector" placeholder="e.g. Healthcare" value="${c.sector_code||''}">
         </div>
+      </div>
+      <div style="height:1px;background:var(--border);margin:6px 0 14px"></div>
+      <div style="font-size:8px;letter-spacing:2px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;margin-bottom:10px">Source Access</div>
+      <div class="edit-field">
+        <label class="edit-label">Author(s)</label>
+        <input class="edit-input" id="kbef-author" placeholder="e.g. Tim Koller, Marc Goedhart" value="${(sa.author||'').replace(/"/g,'&quot;')}">
       </div>
       <div class="edit-row">
         <div class="edit-field">
-          <label class="edit-label">Sector</label>
-          <input class="edit-input" id="kbef-sector" placeholder="e.g. Healthcare" value="${c.sector_code||''}">
+          <label class="edit-label">ISBN</label>
+          <input class="edit-input" id="kbef-isbn" placeholder="978-0-..." value="${(sa.isbn||'').replace(/"/g,'&quot;')}">
         </div>
         <div class="edit-field">
           <label class="edit-label">Confidence</label>
@@ -1515,6 +1614,10 @@ function openKBEditMode(id){
             <option value="low"    ${c.confidence==='low'   ?'selected':''}>low</option>
           </select>
         </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Canonical URL</label>
+        <input class="edit-input" id="kbef-url" placeholder="https://publisher.com/..." value="${(sa.canonical_url||'').replace(/"/g,'&quot;')}">
       </div>
     </div>
   </div>`;
@@ -1526,16 +1629,35 @@ function openKBEditMode(id){
 }
 
 async function saveKBEdit(id){
+  const n = state.notes.find(x=>x.note_id===id);
+  const existingSd = (n&&n.structured_data)||{};
+  const existingKbq = existingSd.kb_quality||{};
+  const existingSa  = existingSd.source_access||{};
+  const tier = document.getElementById('kbef-tier')?.value||existingKbq.tier||'';
+  const fit  = document.getElementById('kbef-fit')?.value||existingKbq.benelux_fit||'';
+  const author = document.getElementById('kbef-author')?.value.trim()||'';
+  const isbn   = document.getElementById('kbef-isbn')?.value.trim()||'';
+  const url    = document.getElementById('kbef-url')?.value.trim()||'';
+  const newSd = {
+    ...existingSd,
+    kb_quality: { ...existingKbq, tier, benelux_fit: fit },
+    source_access: {
+      ...existingSa,
+      author: author||existingSa.author||null,
+      isbn:   isbn||existingSa.isbn||null,
+      canonical_url: url||existingSa.canonical_url||null,
+      access_type: (url||existingSa.canonical_url)?'canonical_only':'none',
+    },
+  };
   const patch = {
     title:             document.getElementById('kbef-title').value.trim(),
     intended_audience: document.getElementById('kbef-audience').value,
-    sensitivity_level: document.getElementById('kbef-sensitivity').value,
     sector_code:       document.getElementById('kbef-sector').value.trim() || null,
     confidence:        document.getElementById('kbef-confidence').value,
+    structured_data:   newSd,
   };
   try {
     await sbPatch('grapevine_notes', {'note_id': `eq.${id}`}, patch);
-    const n = state.notes.find(x=>x.note_id===id);
     if(n) Object.assign(n, patch);
     showToast('✓ Card updated');
     renderKB();
@@ -1722,11 +1844,11 @@ async function ingestAll(){
         visibility_scope: 'TEAM',
         intended_audience:q.intended_audience,
         time_sensitivity: q.time_sensitivity,
+        confidence:       q.confidence,
         sector_code:      q.sector||null,
         geo_country:      q.country||null,
         title:            q.title,
-        body:             q.text||'',
-        body_md:          q.text||'',
+        body_md:          q.text||null,
         summary_short:    q.text?q.text.slice(0,300):null,
         language_code:    'en',
         is_ai_derived:    false,
@@ -1737,10 +1859,9 @@ async function ingestAll(){
         file_checksum:        q.file_hash||null,
         content_fingerprint_hash: contentHash,
         structured_data:{
-          source_box:      q.url||q.source||null,
+          source_box: q.url||q.source||null,
           source_language: 'en',
-          drop_source:     q.source||null,
-          confidence:      q.confidence||null,
+          drop_source: q.source||null,
         },
       };
       await sbPost('grapevine_notes',note);
