@@ -1431,9 +1431,26 @@ function selectKB(id){
       ${sd.deal_implication?`<div class="section">${sl('Deal Implication')}<div style="font-size:12px;color:var(--muted);line-height:1.65">${sd.deal_implication}</div></div>`:''}
       ${sd.misread_risk?`<div class="section">${sl('⚠ Misread Risk','var(--amber)')}<div class="warning-block">${sd.misread_risk}</div></div>`:''}
       ${sd.best_use&&sd.best_use.length?`<div class="section">${sl('Best Use')}<div class="pill-row">${sd.best_use.map(u=>pill(u)).join('')}</div></div>`:''}
+
+      ${(()=>{
+        const sa = sd.source_access || {};
+        const hasSource = sa.canonical_url || sa.isbn || sa.author || sd.source_box;
+        if(!hasSource) return '';
+        return `<div class="section">${sl('Source')}
+          <div style="background:var(--bg-code);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:11px;font-family:var(--mono);line-height:1.9">
+            ${sa.author?`<div><span style="color:var(--faint)">Author</span>&nbsp;&nbsp;<span style="color:var(--txt)">${sa.author}</span></div>`:''}
+            ${sa.isbn?`<div><span style="color:var(--faint)">ISBN&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;<span style="color:var(--muted)">${sa.isbn}</span></div>`:''}
+            ${sd.source_box?`<div style="margin-top:4px;color:var(--muted);font-size:10px">${sd.source_box.slice(0,200)}</div>`:''}
+            ${sa.canonical_url?`<div style="margin-top:6px"><a href="${sa.canonical_url}" target="_blank" rel="noopener" style="color:var(--brand);font-size:10px;text-decoration:none">🔗 Open source ↗</a></div>`:''}
+            ${sd.storage_url||sa.storage_url?`<a href="#" onclick="openStorageDoc('${sd.storage_url||sa.storage_url}');return false;" style="display:inline-block;margin-top:4px;color:var(--brand);font-size:10px;font-family:var(--mono);text-decoration:none">📄 Open document</a>`:''}
+          </div>
+        </div>`;
+      })()}
+
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:12px">
         ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
-        ${c.geo_country?badge(c.geo_country,'var(--faint)','var(--bg-code)'):''}
+        ${sd.kb_quality&&sd.kb_quality.tier?badge('Tier '+sd.kb_quality.tier, sd.kb_quality.tier==='A'?'var(--sage-txt)':sd.kb_quality.tier==='B'?'var(--gold)':'var(--muted)', sd.kb_quality.tier==='A'?'var(--sage-dim)':sd.kb_quality.tier==='B'?'var(--gold-dim)':'var(--bg-code)'):''}
+        ${sd.kb_quality&&sd.kb_quality.benelux_fit?badge(sd.kb_quality.benelux_fit==='direct'?'🎯 direct':sd.kb_quality.benelux_fit==='analogous'?'↔ analogous':'○ background','var(--faint)','var(--bg-code)'):''}
         ${confBadge(c.confidence)}
       </div>
     </div>
