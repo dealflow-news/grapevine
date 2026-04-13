@@ -370,6 +370,13 @@ nav{padding:14px 0;flex:1;}
             <button id="kbf-analogous" class="kb-view-btn"        onclick="setKBFit('analogous')" style="font-size:9px;padding:3px 8px">EU applicable</button>
             <button id="kbf-background"class="kb-view-btn"        onclick="setKBFit('background')" style="font-size:9px;padding:3px 8px;color:var(--faint)">Background</button>
           </div>
+          <div style="display:flex;gap:3px;align-items:center;margin-left:8px">
+            <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em">Tier</span>
+            <button id="kbt-all" class="kb-view-btn active" onclick="setKBTier('all')" style="font-size:9px;padding:3px 8px">All</button>
+            <button id="kbt-A"   class="kb-view-btn"        onclick="setKBTier('A')"   style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">A</button>
+            <button id="kbt-B"   class="kb-view-btn"        onclick="setKBTier('B')"   style="font-size:9px;padding:3px 8px;color:var(--gold-txt)">B</button>
+            <button id="kbt-C"   class="kb-view-btn"        onclick="setKBTier('C')"   style="font-size:9px;padding:3px 8px;color:var(--faint)">C</button>
+          </div>
         </div>
         <div style="display:flex;flex:1;overflow:hidden;">
           <div id="kb-grid-wrap" style="width:420px;min-width:320px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);"><div class="kb-grid" id="kb-grid"></div></div>
@@ -703,6 +710,7 @@ const state = {
   dropNoteType: 'KNOWLEDGE_CARD',
   kbView: 'all',    // all | library | patterns | standards
   kbFit:  'all',    // all | direct | analogous | background
+  kbTier: 'all',    // all | A | B | C
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -1360,8 +1368,52 @@ function selectMandate(id){
 
 // ═══════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════
-// KNOWLEDGE BASE
+// KNOWLEDGE BASE — Domain-grouped folio view
 // ═══════════════════════════════════════════════════════════════
+
+// 9-domain classifier (client-side, no SQL needed)
+function getDomain(n){
+  const sd=n.structured_data||{};
+  const ct=sd.card_type||'';
+  if(ct==='pattern')  return '◈ Observed Patterns';
+  if(ct==='standard') return '▣ Valuation Standards';
+  const t=(n.title||'').toLowerCase();
+  const s=(n.sector_code||'').toLowerCase();
+  if(/platform|tirole|contemporary strategy|grant|techno-economic|perez|industry 4|new map|yergin|global value chain|gvc|industrial organization|l.conomie|discontinuous/.test(t))
+    return '01 — Sector Deep Dives';
+  if(/narrative economics|shiller|forecasting|tetlock|signal and noise|silver|factfulness|rosling|black swan|fooled by randomness|taleb|thinking in systems|prospective stratégique|godet/.test(t))
+    return '02 — Strategic Narratives & Outlooks';
+  if(/m.a|merger|acquisition|rosenbaum|deals from hell|bruner|synergy trap|sirower|art of m.a|sherman|integration|fusies|davis|investment banking/.test(t))
+    return '03 — M&A Playbooks & Deal Intelligence';
+  if(/valuation|damodaran|graham|intelligent investor|security analysis|vernimmen|corporate finance|pratt|valuing a business|narrative and numbers/.test(t)||s.includes('valuation'))
+    return '04 — Valuation & Capital Markets';
+  if(/private equity|mastering pe|zeisberger|pe playbook|coffey|king of capital|buyout/.test(t)||s.includes('private equity'))
+    return '05 — PE & Investor Models';
+  if(/search fund|buy then build|deibel|hbr guide|small business|entrepreneurial|messy marketplace|beshore|seiler tucker|exit rich|succession/.test(t))
+    return '06 — ETA & Entrepreneurial Buyouts';
+  if(/psychology|barriers|cognitive|kahneman|thaler|ariely|cialdini|voss|getting to yes|fisher|trusted advisor|maister|malhotra|negotiat|nudge|predictably|wisdom of crowds|gilovich|misbehaving|stone|difficult conversations|weesie|judgment under|heuristics|surowiecki|influence/.test(t))
+    return '07 — Buyer Psychology & Deal Dynamics';
+  if(/demographic|goodhart|resilience|sheffi|imf|economic outlook|measuring|oecd|competing on analytics|davenport|business intelligence|superforecasting|rise and fall|sharma|second machine age|megatrends|world economy|benchmarking|reports/.test(t)||s.includes('benchmarking'))
+    return '08 — Trends, Benchmarking & Reports';
+  if(/manufacturing consent|merchants of doubt|nouveaux chiens|halimi|spectacle|nieuwsfabriek|formation|bachelard|editorial|signal intelligence|media bias/.test(t)||s.includes('editorial'))
+    return '09 — Editorial & Signal Intelligence';
+  return '03 — M&A Playbooks & Deal Intelligence';
+}
+
+const DOMAIN_ORDER=[
+  '◈ Observed Patterns',
+  '▣ Valuation Standards',
+  '01 — Sector Deep Dives',
+  '02 — Strategic Narratives & Outlooks',
+  '03 — M&A Playbooks & Deal Intelligence',
+  '04 — Valuation & Capital Markets',
+  '05 — PE & Investor Models',
+  '06 — ETA & Entrepreneurial Buyouts',
+  '07 — Buyer Psychology & Deal Dynamics',
+  '08 — Trends, Benchmarking & Reports',
+  '09 — Editorial & Signal Intelligence',
+];
+
 function closeKBDetail(){
   state.selectedKBId=null;
   const kd=document.getElementById('kb-detail');
@@ -1372,32 +1424,28 @@ function closeKBDetail(){
 
 function setKBView(v){
   state.kbView=v;
-  ['all','library','patterns','standards'].forEach(x=>{
-    document.getElementById(`kbv-${x}`)?.classList.toggle('active',x===v);
-  });
-  closeKBDetail();
-  renderKB();
+  ['all','library','patterns','standards'].forEach(x=>document.getElementById(`kbv-${x}`)?.classList.toggle('active',x===v));
+  closeKBDetail(); renderKB();
 }
-
 function setKBFit(f){
   state.kbFit=f;
-  ['all','direct','analogous','background'].forEach(x=>{
-    document.getElementById(`kbf-${x}`)?.classList.toggle('active',x===f);
-  });
+  ['all','direct','analogous','background'].forEach(x=>document.getElementById(`kbf-${x}`)?.classList.toggle('active',x===f));
+  renderKB();
+}
+function setKBTier(t){
+  state.kbTier=t;
+  ['all','A','B','C'].forEach(x=>document.getElementById(`kbt-${x}`)?.classList.toggle('active',x===t));
   renderKB();
 }
 
-// Tier badge — A/B/C
 function tierBadge(tier){
-  if(!tier) return '';
+  if(!tier)return'';
   const cfg={A:{c:'var(--sage-txt)',b:'var(--sage-dim)'},B:{c:'var(--gold-txt)',b:'var(--gold-dim)'},C:{c:'var(--faint)',b:'var(--bg-code)'}};
   const {c,b}=cfg[tier]||{c:'var(--faint)',b:'var(--bg-code)'};
   return badge(`Tier ${tier}`,c,b);
 }
-
-// Regional fit label — human readable
 function fitLabel(fit){
-  if(!fit) return '';
+  if(!fit)return'';
   const map={direct:'🎯 Benelux/FR direct',analogous:'EU applicable',background:'Background'};
   const col={direct:'var(--sage-txt)',analogous:'var(--muted)',background:'var(--faint)'};
   return `<span class="badge" style="color:${col[fit]||'var(--faint)'};background:var(--bg-r);border:1px solid var(--border)">${map[fit]||fit}</span>`;
@@ -1409,9 +1457,10 @@ function renderKB(){
   const showArchived=document.getElementById('kb-show-archived').checked;
   const view=state.kbView||'all';
   const fit=state.kbFit||'all';
+  const tier=state.kbTier||'all';
 
-  const matchQ = n => {
-    if(q.length<2) return true;
+  const matchQ=n=>{
+    if(q.length<2)return true;
     const sd=n.structured_data||{};
     return (n.title||'').toLowerCase().includes(q)||
       (sd.core_insight||'').toLowerCase().includes(q)||
@@ -1419,52 +1468,55 @@ function renderKB(){
       (n.sector_code||'').toLowerCase().includes(q)||
       (sd.source_access?.author||'').toLowerCase().includes(q);
   };
-
-  const matchView = n => {
+  const matchView=n=>{
     const ct=(n.structured_data||{}).card_type||'';
-    if(view==='library')  return ct==='library_source';
-    if(view==='patterns') return ct==='pattern';
+    if(view==='library') return ct==='library_source';
+    if(view==='patterns')return ct==='pattern';
     if(view==='standards')return ct==='standard';
     return true;
   };
-
-  const matchFit = n => {
-    if(fit==='all') return true;
+  const matchFit=n=>{
+    if(fit==='all')return true;
     return ((n.structured_data||{}).kb_quality?.benelux_fit||'')=== fit;
   };
+  const matchTier=n=>{
+    if(tier==='all')return true;
+    return ((n.structured_data||{}).kb_quality?.tier||'')=== tier;
+  };
 
-  const base = n => n.note_type==='KNOWLEDGE_CARD'&&!n.is_deleted&&matchQ(n)&&matchView(n)&&matchFit(n);
-  const activeCards   = !showDrafts ? state.notes.filter(n=>base(n)&&n.status==='active')   : [];
-  const draftCards    = showDrafts  ? state.notes.filter(n=>base(n)&&n.status==='draft')    : [];
-  const archivedCards = showArchived? state.notes.filter(n=>base(n)&&n.status==='archived') : [];
+  const base=n=>n.note_type==='KNOWLEDGE_CARD'&&!n.is_deleted&&matchQ(n)&&matchView(n)&&matchFit(n)&&matchTier(n);
+  const activeCards  =!showDrafts?state.notes.filter(n=>base(n)&&n.status==='active'):[];
+  const draftCards   =showDrafts ?state.notes.filter(n=>base(n)&&n.status==='draft') :[];
+  const archivedCards=showArchived?state.notes.filter(n=>base(n)&&n.status==='archived'):[];
 
-  // Update view tab counts (all active, no filters except view)
-  const allKC = state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='active'&&!n.is_deleted);
-  document.getElementById('kbvc-all'     )?.textContent=allKC.length;
-  document.getElementById('kbvc-library' )?.textContent=allKC.filter(n=>(n.structured_data||{}).card_type==='library_source').length;
-  document.getElementById('kbvc-patterns')?.textContent=allKC.filter(n=>(n.structured_data||{}).card_type==='pattern').length;
-  document.getElementById('kbvc-standards')?.textContent=allKC.filter(n=>(n.structured_data||{}).card_type==='standard').length;
+  // Update counts
+  const allKC=state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='active'&&!n.is_deleted);
+  document.getElementById('kbvc-all')?.textContent      !=null && (document.getElementById('kbvc-all').textContent      =allKC.length);
+  document.getElementById('kbvc-library')?.textContent  !=null && (document.getElementById('kbvc-library').textContent  =allKC.filter(n=>(n.structured_data||{}).card_type==='library_source').length);
+  document.getElementById('kbvc-patterns')?.textContent !=null && (document.getElementById('kbvc-patterns').textContent =allKC.filter(n=>(n.structured_data||{}).card_type==='pattern').length);
+  document.getElementById('kbvc-standards')?.textContent!=null && (document.getElementById('kbvc-standards').textContent=allKC.filter(n=>(n.structured_data||{}).card_type==='standard').length);
 
-  const total = activeCards.length + draftCards.length + archivedCards.length;
+  const total=activeCards.length+draftCards.length+archivedCards.length;
   document.getElementById('kb-count').textContent=`${total} card${total!==1?'s':''}`;
 
-  const renderCard = c => {
+  const renderCard=c=>{
     const sd=c.structured_data||{};
     const sel=state.selectedKBId===c.note_id;
-    const tier=(sd.kb_quality||{}).tier;
-    const fit=(sd.kb_quality||{}).benelux_fit;
+    const t=(sd.kb_quality||{}).tier;
+    const f=(sd.kb_quality||{}).benelux_fit;
     const ct=sd.card_type||'';
-    const ctIcon=ct==='pattern'?'◈ ':ct==='standard'?'▣ ':'';
-    return `<div class="kb-card${sel?' selected':''}" tabindex="0" onclick="selectKB('${c.note_id}')" onkeydown="if(event.key==='Enter'||event.key===' ')selectKB('${c.note_id}')">
-      <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
-        ${tier?tierBadge(tier):''}
+    const icon=ct==='pattern'?'◈ ':ct==='standard'?'▣ ':'';
+    return `<div class="kb-card${sel?' selected':''}" tabindex="0"
+      onclick="selectKB('${c.note_id}')"
+      onkeydown="if(event.key==='Enter'||event.key===' ')selectKB('${c.note_id}')">
+      <div style="display:flex;gap:4px;margin-bottom:7px;flex-wrap:wrap;align-items:center">
+        ${t?tierBadge(t):''}
+        ${f==='direct'?`<span class="badge" style="color:var(--sage-txt);background:var(--sage-dim)">🎯 Direct</span>`:''}
         ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
-        ${fit&&fit!=='background'?fitLabel(fit):''}
       </div>
-      <div class="kb-card-title">${ctIcon}${c.title||'(untitled)'}</div>
-      <div class="kb-card-excerpt">${truncate(sd.core_insight||c.summary_short||'',110)}</div>
-      ${sd.storage_url||sd.source_access?.storage_url?`<div style="margin-top:4px"><span style="font-size:10px;color:var(--accent);font-family:var(--mono);background:var(--bg-code);border:1px solid var(--accent-dim);border-radius:3px;padding:2px 6px">📄 doc</span></div>`:''}
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${(sd.best_use||[]).slice(0,3).map(u=>pill(u)).join('')}</div>
+      <div class="kb-card-title">${icon}${c.title||'(untitled)'}</div>
+      <div class="kb-card-excerpt">${truncate(sd.core_insight||c.summary_short||'',90)}</div>
+      ${(sd.source_access?.author)?`<div style="font-size:10px;color:var(--faint);font-family:var(--mono);margin-top:5px">${sd.source_access.author.split(',')[0].split(';')[0].trim()}</div>`:''}
     </div>`;
   };
 
@@ -1473,20 +1525,49 @@ function renderKB(){
     grid.innerHTML=`<div class="kb-empty"><div style="font-size:28px;margin-bottom:12px">◈</div>No results${q?` for "${q}"`:''}.</div>`;
     return;
   }
+
+  // Domain-grouped view for active cards
   let html='';
+
+  // Drafts section (no grouping)
   if(draftCards.length){
-    html+=`<div style="font-size:8px;letter-spacing:3px;color:var(--gold);font-family:var(--mono);text-transform:uppercase;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px">◈ Drafts — review &amp; promote</div>`;
-    html+=draftCards.map(renderCard).join('');
-    if(activeCards.length||archivedCards.length) html+=`<div style="height:1px;background:var(--border);margin:12px 0"></div>`;
+    html+=`<div style="font-size:8px;letter-spacing:3px;color:var(--gold);font-family:var(--mono);text-transform:uppercase;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px">◈ Drafts — review &amp; promote</div>`;
+    html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">${draftCards.map(renderCard).join('')}</div>`;
   }
-  html+=activeCards.map(renderCard).join('');
+
+  // Group active cards by domain
+  if(activeCards.length){
+    const byDomain={};
+    activeCards.forEach(c=>{
+      const d=getDomain(c);
+      if(!byDomain[d])byDomain[d]=[];
+      byDomain[d].push(c);
+    });
+    DOMAIN_ORDER.forEach(domain=>{
+      const cards=byDomain[domain];
+      if(!cards||!cards.length)return;
+      html+=`<div style="font-size:9px;letter-spacing:.1em;color:var(--accent-txt);font-family:var(--mono);text-transform:uppercase;padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px;font-weight:600">${domain} <span style="color:var(--faint);font-weight:normal">(${cards.length})</span></div>`;
+      html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">${cards.map(renderCard).join('')}</div>`;
+    });
+    // Any uncategorised
+    const known=new Set(DOMAIN_ORDER);
+    Object.keys(byDomain).filter(d=>!known.has(d)).forEach(domain=>{
+      const cards=byDomain[domain];
+      html+=`<div style="font-size:9px;letter-spacing:.1em;color:var(--accent-txt);font-family:var(--mono);text-transform:uppercase;padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px">${domain} (${cards.length})</div>`;
+      html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">${cards.map(renderCard).join('')}</div>`;
+    });
+  }
+
   if(archivedCards.length){
     html+=`<div style="font-size:8px;letter-spacing:3px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;padding:12px 0 8px">📁 Archived</div>`;
-    html+=archivedCards.map(renderCard).join('');
+    html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${archivedCards.map(renderCard).join('')}</div>`;
   }
+
   grid.innerHTML=html;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// ── KB Detail + Edit ─────────────────────────────────────────────────────────
 function selectKB(id){
   state.selectedKBId=state.selectedKBId===id?null:id;
   renderKB();
@@ -1545,15 +1626,14 @@ function selectKB(id){
   `;
 }
 
-// ── KB Edit mode ─────────────────────────────────────────────
 function openKBEditMode(id){
-  const c = state.notes.find(x=>x.note_id===id);
-  if(!c) return;
-  const kd = document.getElementById('kb-detail');
-  const sd = c.structured_data||{};
-  const sa = sd.source_access||{};
-  const kbq= sd.kb_quality||{};
-  const body = `<div class="kb-detail-body">
+  const c=state.notes.find(x=>x.note_id===id);
+  if(!c)return;
+  const kd=document.getElementById('kb-detail');
+  const sd=c.structured_data||{};
+  const sa=sd.source_access||{};
+  const kbq=sd.kb_quality||{};
+  const body=`<div class="kb-detail-body">
     <div style="font-size:11px;letter-spacing:2px;color:var(--accent);font-family:var(--mono);margin-bottom:18px;text-transform:uppercase;">✎ Edit Card</div>
     <div class="edit-form">
       <div class="edit-field">
@@ -1621,53 +1701,49 @@ function openKBEditMode(id){
       </div>
     </div>
   </div>`;
-  const footer = `<div class="kb-detail-footer"><div class="actions">
+  const footer=`<div class="kb-detail-footer"><div class="actions">
     <button class="btn-save" onclick="saveKBEdit('${id}')">✓ Save</button>
     <button class="btn-ghost" onclick="selectKB('${id}')">Cancel</button>
   </div></div>`;
-  kd.innerHTML = body + footer;
+  kd.innerHTML=body+footer;
 }
 
 async function saveKBEdit(id){
-  const n = state.notes.find(x=>x.note_id===id);
-  const existingSd = (n&&n.structured_data)||{};
-  const existingKbq = existingSd.kb_quality||{};
-  const existingSa  = existingSd.source_access||{};
-  const tier = document.getElementById('kbef-tier')?.value||existingKbq.tier||'';
-  const fit  = document.getElementById('kbef-fit')?.value||existingKbq.benelux_fit||'';
-  const author = document.getElementById('kbef-author')?.value.trim()||'';
-  const isbn   = document.getElementById('kbef-isbn')?.value.trim()||'';
-  const url    = document.getElementById('kbef-url')?.value.trim()||'';
-  const newSd = {
+  const n=state.notes.find(x=>x.note_id===id);
+  const existingSd=(n&&n.structured_data)||{};
+  const existingKbq=existingSd.kb_quality||{};
+  const existingSa=existingSd.source_access||{};
+  const tier=document.getElementById('kbef-tier')?.value||existingKbq.tier||'';
+  const fit=document.getElementById('kbef-fit')?.value||existingKbq.benelux_fit||'';
+  const author=document.getElementById('kbef-author')?.value.trim()||'';
+  const isbn=document.getElementById('kbef-isbn')?.value.trim()||'';
+  const url=document.getElementById('kbef-url')?.value.trim()||'';
+  const newSd={
     ...existingSd,
-    kb_quality: { ...existingKbq, tier, benelux_fit: fit },
-    source_access: {
+    kb_quality:{...existingKbq,tier,benelux_fit:fit},
+    source_access:{
       ...existingSa,
-      author: author||existingSa.author||null,
-      isbn:   isbn||existingSa.isbn||null,
-      canonical_url: url||existingSa.canonical_url||null,
-      access_type: (url||existingSa.canonical_url)?'canonical_only':'none',
+      author:author||existingSa.author||null,
+      isbn:isbn||existingSa.isbn||null,
+      canonical_url:url||existingSa.canonical_url||null,
+      access_type:(url||existingSa.canonical_url)?'canonical_only':'none',
     },
   };
-  const patch = {
-    title:             document.getElementById('kbef-title').value.trim(),
-    intended_audience: document.getElementById('kbef-audience').value,
-    sector_code:       document.getElementById('kbef-sector').value.trim() || null,
-    confidence:        document.getElementById('kbef-confidence').value,
-    structured_data:   newSd,
+  const patch={
+    title:            document.getElementById('kbef-title').value.trim(),
+    intended_audience:document.getElementById('kbef-audience').value,
+    sector_code:      document.getElementById('kbef-sector').value.trim()||null,
+    confidence:       document.getElementById('kbef-confidence').value,
+    structured_data:  newSd,
   };
-  try {
-    await sbPatch('grapevine_notes', {'note_id': `eq.${id}`}, patch);
-    if(n) Object.assign(n, patch);
+  try{
+    await sbPatch('grapevine_notes',{'note_id':`eq.${id}`},patch);
+    if(n)Object.assign(n,patch);
     showToast('✓ Card updated');
-    renderKB();
-    selectKB(id);
-  } catch(e) {
-    showToast('Save failed: '+e.message, 'error');
-  }
+    renderKB();selectKB(id);
+  }catch(e){showToast('Save failed: '+e.message,'error');}
 }
 
-// ═══════════════════════════════════════════════════════════════
 // DROP POINT
 // ═══════════════════════════════════════════════════════════════
 const ST_TO_NOTE={'PUBLIC_NEWS':'WHISPER_NOTE','REGULATORY_RECORD':'WHISPER_NOTE','LEGAL_PROCEEDING':'WHISPER_NOTE','STRUCTURED_DB_FEED':'WHISPER_NOTE','MARKETPLACE_LISTING':'WHISPER_NOTE','COMPANY_DISCLOSURE':'WHISPER_NOTE','ADVISOR_ANNOUNCEMENT':'WHISPER_NOTE','RESEARCH_REPORT':'KNOWLEDGE_CARD','BOOK_OR_ARTICLE_EXTRACT':'KNOWLEDGE_CARD','OWN_WHITEPAPER':'KNOWLEDGE_CARD','PODCAST_OR_MEDIA_TRANSCRIPT':'KNOWLEDGE_CARD','VALUATION_DATA':'KNOWLEDGE_CARD','CONFERENCE_OR_EVENT_NOTE':'WHISPER_NOTE','HUMAN_WHISPER':'WHISPER_NOTE','INTERNAL_MEMO':'KNOWLEDGE_CARD','OTHER_INTEL':'WHISPER_NOTE'};
