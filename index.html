@@ -2215,8 +2215,15 @@ async function ingestBatch(){
         structured_data:{
           core_insight:aiCard.core_insight||null, deal_implication:aiCard.deal_implication||null,
           misread_risk:aiCard.misread_risk||null, best_use:aiCard.best_use||null,
-          card_type:'library_source', kb_quality:{tier:item.tier||null,benelux_fit:null},
+          card_type:'library_source', kb_quality:{tier:item.tier||null, benelux_fit:aiCard.benelux_fit||item.benelux_fit||null},
           batch_domain:item.domain||null,
+          kb_tags: aiCard.kb_tags || (aiCard.library_domain ? {
+            library_domain: aiCard.library_domain,
+            asset_type:     aiCard.asset_type     || 'ka_library_source',
+            ma_lens:        aiCard.ma_lens        || [],
+            strategic_themes: aiCard.strategic_themes || [],
+            sector:         aiCard.sector         || [],
+          } : null),
         },
       };
       const created=await sbPost('grapevine_notes',note);
