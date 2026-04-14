@@ -400,6 +400,11 @@ nav{padding:14px 0;flex:1;}
         </div>
         <!-- Row 3: Filters -->
         <div style="display:flex;gap:6px;padding:7px 16px;border-bottom:1px solid var(--border);background:var(--bg-e);flex-shrink:0;align-items:center;flex-wrap:wrap">
+          <button onclick="toggleAllKBDomains()" id="btn-kb-expand"
+            style="font-size:9px;padding:3px 8px;border-radius:4px;cursor:pointer;font-family:var(--mono);border:1px solid var(--border);background:var(--bg-code);color:var(--faint);letter-spacing:.05em;text-transform:uppercase;margin-right:8px">
+            ▼ Expand all
+          </button>
+          <div style="width:1px;height:14px;background:var(--border);margin:0 4px"></div>
           <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-right:2px">Regional fit</span>
           <button id="kbf-all"       class="kb-view-btn active" onclick="setKBFit('all')"        style="font-size:9px;padding:3px 8px">All</button>
           <button id="kbf-direct"    class="kb-view-btn"        onclick="setKBFit('direct')"     style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">🎯 Benelux/FR</button>
@@ -1568,6 +1573,14 @@ function setKBView(v){
   ['all','library','patterns','standards'].forEach(x=>{const el=document.getElementById(`kbv-${x}`);if(el){el.classList.toggle('active',x===v);}});
   closeKBDetail(); renderKB();
 }
+function toggleAllKBDomains(){
+  const anyOpen=DOMAIN_ORDER.some(d=>!state.kbCollapsed[d]);
+  DOMAIN_ORDER.forEach(d=>{ state.kbCollapsed[d]=anyOpen; });
+  const btn=document.getElementById('btn-kb-expand');
+  if(btn) btn.textContent=anyOpen?'▼ Expand all':'▶ Collapse all';
+  renderKB();
+}
+
 function setKBFit(f){
   state.kbFit=f;
   ['all','direct','analogous','background'].forEach(x=>document.getElementById(`kbf-${x}`)?.classList.toggle('active',x===f));
