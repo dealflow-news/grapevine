@@ -1571,8 +1571,15 @@ function renderKB(){
     DOMAIN_ORDER.forEach(domain=>{
       const cards=byDomain[domain];
       if(!cards||!cards.length)return;
-      html+=`<div style="font-size:9px;letter-spacing:.1em;color:var(--accent-txt);font-family:var(--mono);text-transform:uppercase;padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px;font-weight:600">${domain} <span style="color:var(--faint);font-weight:normal">(${cards.length})</span></div>`;
-      html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">${cards.map(renderCard).join('')}</div>`;
+      const collapsed=!!state.kbCollapsed[domain];
+      html+=`<div style="font-size:9px;letter-spacing:.1em;color:var(--accent-txt);font-family:var(--mono);text-transform:uppercase;padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:${collapsed?'2':'8'}px;font-weight:600;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px"
+        onclick="state.kbCollapsed[this.dataset.d]=!state.kbCollapsed[this.dataset.d];renderKB()" data-d="${domain}">
+        <span style="font-size:10px;color:var(--faint);line-height:1">${collapsed?'▶':'▼'}</span>
+        ${domain} <span style="color:var(--faint);font-weight:normal;margin-left:4px">(${cards.length})</span>
+      </div>`;
+      if(!collapsed){
+        html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">${cards.map(renderCard).join('')}</div>`;
+      }
     });
     // Any uncategorised
     const known=new Set(DOMAIN_ORDER);
