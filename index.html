@@ -1836,10 +1836,48 @@ async function loadFile(file){
   const ext=file.name.split('.').pop().toLowerCase();
   if(ext==='mp3'){document.getElementById('dp-source-type').value='PODCAST_OR_MEDIA_TRANSCRIPT';setNoteType('KNOWLEDGE_CARD');}
   else if(['pdf','docx','doc'].includes(ext)){document.getElementById('dp-source-type').value='BOOK_OR_ARTICLE_EXTRACT';setNoteType('KNOWLEDGE_CARD');}
+  // Store file object for AI enrichment at ingest time
+  state.dropFile = file;
+  state.dropFileText = '';
   if(['txt','md'].includes(ext)){
     const reader=new FileReader();
-    reader.onload=ev=>{document.getElementById('dp-text').value=ev.target.result.slice(0,2000);};
+    reader.onload=ev=>{
+      state.dropFileText=ev.target.result.slice(0,8000);
+      document.getElementById('dp-text').value=state.dropFileText.slice(0,2000);
+    };
     reader.readAsText(file);
+  } else if(ext==='pdf'){
+    // Extract PDF text via PDF.js (loaded from CDN)
+    try{
+      document.getElementById('file-name').textContent='📄 '+file.name+' — reading…';
+      const arrayBuf=await file.arrayBuffer();
+      if(typeof pdfjsLib==='undefined'){
+        await new Promise((res,rej)=>{
+          const s=document.createElement('script');
+          s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+          s.onload=res; s.onerror=rej;
+          document.head.appendChild(s);
+        });
+        pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+      const pdf=await pdfjsLib.getDocument({data:arrayBuf}).promise;
+      let text='';
+      const maxPages=Math.min(pdf.numPages,30);
+      for(let p=1;p<=maxPages;p++){
+        const page=await pdf.getPage(p);
+        const tc=await page.getTextContent();
+        text+=tc.items.map(i=>i.str).join(' ')+'
+';
+        if(text.length>12000)break;
+      }
+      state.dropFileText=text.trim().slice(0,12000);
+      document.getElementById('file-name').textContent='📄 '+file.name+' ('+pdf.numPages+'p — text extracted ✓)';
+      if(!document.getElementById('dp-text').value)
+        document.getElementById('dp-text').value=state.dropFileText.slice(0,500)+'…';
+    }catch(e){
+      console.warn('PDF extract failed:',e);
+      document.getElementById('file-name').textContent='📄 '+file.name+' (text extract failed — will use title)';
+    }
   }
   // Compute file checksum for dedup
   try{
@@ -1888,8 +1926,12 @@ async function addToQueue(){
   if(!hasContent){showToast('Add a file, URL or text first','warn');return;}
 
   const qTitle=title||(url?new URL(url.startsWith('http')?url:'https://'+url).hostname:null)||text.slice(0,60)||'Untitled';
+  const fileText=state.dropFileText||'';
   state.dropQueue.push({
-    qid:state.dropNextId++, title:qTitle, url, text,
+    qid:state.dropNextId++, title:qTitle, url,
+    text: fileText || text,  // prefer extracted file text
+    file_text: fileText,     // keep separately for AI enrichment
+    file_name: state.dropFile?.name||null,
     source_type:document.getElementById('dp-source-type').value,
     evidence_type:document.getElementById('dp-evidence').value,
     sector:document.getElementById('dp-sector').value,
@@ -1916,7 +1958,7 @@ function clearDropForm(){
   document.getElementById('dp-confidence').value='medium';
   document.getElementById('dp-timesens').value='TIMELESS';
   document.getElementById('dp-audience').value='internal';
-  state.dropFileHash=null; state.dropUrlHash=null; state.dropDupAccepted=false;
+  state.dropFileHash=null; state.dropUrlHash=null; state.dropDupAccepted=false; state.dropFile=null; state.dropFileText='';
   setNoteType('KNOWLEDGE_CARD');
 }
 
@@ -1962,6 +2004,33 @@ async function ingestAll(){
         const normalized=q.text.slice(0,2000).toLowerCase().replace(/\s+/g,' ').trim();
         contentHash=await sha256(normalized);
       }
+      // AI enrichment for KNOWLEDGE_CARDs with extracted file text
+      let aiCard={};
+      if(q.note_type==='KNOWLEDGE_CARD' && (q.file_text||q.text)){
+        try{
+          const aiResp=await fetch('https://api.anthropic.com/v1/messages',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01'},
+            body:JSON.stringify({
+              model:'claude-haiku-4-5-20251001',
+              max_tokens:1000,
+              system:`You are a senior editorial intelligence editor at a Benelux M&A platform. Extract a reusable KNOWLEDGE_CARD from this document excerpt. Audience: deal professionals, founders, PE partners. Return ONLY valid JSON — no markdown, no preamble:
+{"title":"<sharp title max 12 words>","core_insight":"<2-3 sentences: structural pattern + why recurring>","deal_implication":"<2-3 sentences: actionable for deal professional>","misread_risk":"<1-2 sentences: dangerous misinterpretation>","best_use":["<use case 1>","<use case 2>","<use case 3>"]}`,
+              messages:[{role:'user',content:`Title: ${q.title}
+File: ${q.file_name||'document'}
+
+Content excerpt:
+${(q.file_text||q.text).slice(0,8000)}`}]
+            })
+          });
+          if(aiResp.ok){
+            const aiData=await aiResp.json();
+            const raw=(aiData.content||[]).find(b=>b.type==='text')?.text||'';
+            const parsed=JSON.parse(raw.replace(/^```json|```$/g,'').trim());
+            if(parsed.core_insight) aiCard=parsed;
+          }
+        }catch(e){console.warn('AI enrichment failed:',e);}
+      }
       const note={
         note_type:        q.note_type,
         status:           'draft',
@@ -1976,10 +2045,7 @@ async function ingestAll(){
         confidence:       q.confidence,
         sector_code:      q.sector||null,
         geo_country:      q.country||null,
-        title:            q.title,
-        body:             q.text||'',
-        body_md:          q.text||null,
-        summary_short:    q.text?q.text.slice(0,300):null,
+        // title/body/summary set above via aiCard merge
         language_code:    'en',
         is_ai_derived:    false,
         is_deleted:       false,
@@ -1988,10 +2054,20 @@ async function ingestAll(){
         canonical_url_hash:   q.url_hash||null,
         file_checksum:        q.file_hash||null,
         content_fingerprint_hash: contentHash,
+        title:            aiCard.title||q.title,
+        body:             q.text||q.file_text||'',
+        body_md:          q.text||q.file_text||null,
+        summary_short:    (aiCard.core_insight||(q.text||'').slice(0,300))||null,
         structured_data:{
-          source_box: q.url||q.source||null,
+          source_box:      q.url||q.source||null,
           source_language: 'en',
-          drop_source: q.source||null,
+          drop_source:     q.source||null,
+          core_insight:    aiCard.core_insight||null,
+          deal_implication:aiCard.deal_implication||null,
+          misread_risk:    aiCard.misread_risk||null,
+          best_use:        aiCard.best_use||null,
+          card_type:       q.note_type==='KNOWLEDGE_CARD'?'library_source':null,
+          kb_quality:      q.note_type==='KNOWLEDGE_CARD'?{tier:null,benelux_fit:null}:null,
         },
       };
       await sbPost('grapevine_notes',note);
