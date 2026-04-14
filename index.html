@@ -354,39 +354,40 @@ nav{padding:14px 0;flex:1;}
 
       <!-- KNOWLEDGE BASE -->
       <div class="tab" id="tab-kb">
-        <div class="kb-toolbar">
-          <div class="kb-search">
-            <input type="text" id="kb-input" placeholder="Search patterns, sectors, use cases…" oninput="renderKB()"/>
-            <button class="clear" onclick="document.getElementById('kb-input').value='';renderKB()">×</button>
-          </div>
-          <span class="kb-count" id="kb-count">0 cards</span>
-          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;">
-            <input type="checkbox" id="kb-show-drafts" onchange="closeKBDetail();renderKB()"> Show drafts
+        <!-- Row 1: View tabs + card count -->
+        <div class="status-bar">
+          <button id="kbv-all"      class="status-btn active" onclick="setKBView('all')">All <span id="kbvc-all"      class="status-count">0</span></button>
+          <button id="kbv-library"  class="status-btn"        onclick="setKBView('library')">◉ Library <span id="kbvc-library"   class="status-count">0</span></button>
+          <button id="kbv-patterns" class="status-btn"        onclick="setKBView('patterns')">◈ Patterns <span id="kbvc-patterns"  class="status-count">0</span></button>
+          <button id="kbv-standards"class="status-btn"        onclick="setKBView('standards')">▣ Standards <span id="kbvc-standards" class="status-count">0</span></button>
+          <span class="kb-count" id="kb-count" style="margin-left:auto;font-size:10px;color:var(--faint);font-family:var(--mono)">0 cards</span>
+          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:12px">
+            <input type="checkbox" id="kb-show-drafts" onchange="closeKBDetail();renderKB()"> Drafts
           </label>
-          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:10px;">
-            <input type="checkbox" id="kb-show-archived" onchange="renderKB()"> Include archived
+          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:8px">
+            <input type="checkbox" id="kb-show-archived" onchange="renderKB()"> Archived
           </label>
         </div>
-        <!-- D.2 — View tabs: All / Library / Patterns / Standards -->
-        <div style="display:flex;gap:3px;padding:8px 18px;border-bottom:1px solid var(--border);background:var(--bg-e);flex-shrink:0;">
-          <button id="kbv-all"      class="kb-view-btn active" onclick="setKBView('all')">All <span id="kbvc-all"     class="status-count">0</span></button>
-          <button id="kbv-library"  class="kb-view-btn"        onclick="setKBView('library')">◉ Library <span id="kbvc-library"  class="status-count">0</span></button>
-          <button id="kbv-patterns" class="kb-view-btn"        onclick="setKBView('patterns')">◈ Patterns <span id="kbvc-patterns" class="status-count">0</span></button>
-          <button id="kbv-standards"class="kb-view-btn"        onclick="setKBView('standards')">▣ Standards <span id="kbvc-standards" class="status-count">0</span></button>
-          <div style="margin-left:auto;display:flex;gap:4px;align-items:center;">
-            <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em">Regional Fit</span>
-            <button id="kbf-all"       class="kb-view-btn active" onclick="setKBFit('all')"       style="font-size:9px;padding:3px 8px">All</button>
-            <button id="kbf-direct"    class="kb-view-btn"        onclick="setKBFit('direct')"    style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">🎯 Direct</button>
-            <button id="kbf-analogous" class="kb-view-btn"        onclick="setKBFit('analogous')" style="font-size:9px;padding:3px 8px">EU applicable</button>
-            <button id="kbf-background"class="kb-view-btn"        onclick="setKBFit('background')" style="font-size:9px;padding:3px 8px;color:var(--faint)">Background</button>
+        <!-- Row 2: Search -->
+        <div style="padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg-e);flex-shrink:0">
+          <div class="kb-search" style="max-width:100%">
+            <input type="text" id="kb-input" placeholder="Search title, author, insight, use case…" oninput="renderKB()"/>
+            <button class="clear" onclick="document.getElementById('kb-input').value='';renderKB()">×</button>
           </div>
-          <div style="display:flex;gap:3px;align-items:center;margin-left:8px">
-            <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em">Tier</span>
-            <button id="kbt-all" class="kb-view-btn active" onclick="setKBTier('all')" style="font-size:9px;padding:3px 8px">All</button>
-            <button id="kbt-A"   class="kb-view-btn"        onclick="setKBTier('A')"   style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">A</button>
-            <button id="kbt-B"   class="kb-view-btn"        onclick="setKBTier('B')"   style="font-size:9px;padding:3px 8px;color:var(--gold-txt)">B</button>
-            <button id="kbt-C"   class="kb-view-btn"        onclick="setKBTier('C')"   style="font-size:9px;padding:3px 8px;color:var(--faint)">C</button>
-          </div>
+        </div>
+        <!-- Row 3: Filters -->
+        <div style="display:flex;gap:6px;padding:7px 16px;border-bottom:1px solid var(--border);background:var(--bg-e);flex-shrink:0;align-items:center;flex-wrap:wrap">
+          <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-right:2px">Regional fit</span>
+          <button id="kbf-all"       class="kb-view-btn active" onclick="setKBFit('all')"        style="font-size:9px;padding:3px 8px">All</button>
+          <button id="kbf-direct"    class="kb-view-btn"        onclick="setKBFit('direct')"     style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">🎯 Benelux/FR</button>
+          <button id="kbf-analogous" class="kb-view-btn"        onclick="setKBFit('analogous')"  style="font-size:9px;padding:3px 8px">EU applicable</button>
+          <button id="kbf-background"class="kb-view-btn"        onclick="setKBFit('background')" style="font-size:9px;padding:3px 8px;color:var(--faint)">Background</button>
+          <div style="width:1px;height:14px;background:var(--border);margin:0 4px"></div>
+          <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-right:2px">Tier</span>
+          <button id="kbt-all" class="kb-view-btn active" onclick="setKBTier('all')" style="font-size:9px;padding:3px 8px">All</button>
+          <button id="kbt-A"   class="kb-view-btn"        onclick="setKBTier('A')"   style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">A</button>
+          <button id="kbt-B"   class="kb-view-btn"        onclick="setKBTier('B')"   style="font-size:9px;padding:3px 8px;color:var(--gold-txt)">B</button>
+          <button id="kbt-C"   class="kb-view-btn"        onclick="setKBTier('C')"   style="font-size:9px;padding:3px 8px;color:var(--faint)">C</button>
         </div>
         <div style="display:flex;flex:1;overflow:hidden;">
           <div id="kb-grid-wrap" style="width:420px;min-width:320px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);"><div class="kb-grid" id="kb-grid"></div></div>
@@ -721,6 +722,7 @@ const state = {
   kbView: 'all',    // all | library | patterns | standards
   kbFit:  'all',    // all | direct | analogous | background
   kbTier: 'all',    // all | A | B | C
+  kbCollapsed: {},  // domain label -> bool
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -1447,7 +1449,7 @@ function closeKBDetail(){
 
 function setKBView(v){
   state.kbView=v;
-  ['all','library','patterns','standards'].forEach(x=>document.getElementById(`kbv-${x}`)?.classList.toggle('active',x===v));
+  ['all','library','patterns','standards'].forEach(x=>{const el=document.getElementById(`kbv-${x}`);if(el){el.classList.toggle('active',x===v);}});
   closeKBDetail(); renderKB();
 }
 function setKBFit(f){
