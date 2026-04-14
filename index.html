@@ -317,6 +317,16 @@ nav{padding:14px 0;flex:1;}
           <button class="status-btn"         id="sb-archived"   onclick="setCurateFilter('archived')">Archived  <span class="status-count" id="sc-archived">0</span></button>
           <button class="status-btn"         id="sb-candidates" onclick="setCurateFilter('candidates')" style="border-color:var(--gold);color:var(--gold);opacity:.85">◉ Candidates  <span class="status-count" id="sc-candidates">0</span></button>
         </div>
+        <div style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg-r)">
+          <div style="display:flex;align-items:center;gap:6px;background:var(--bg-code);border:1px solid var(--border);border-radius:5px;padding:5px 10px">
+            <span style="color:var(--faint);font-size:12px">⌕</span>
+            <input type="text" id="curate-search" placeholder="Search title, sector, country…"
+              style="background:transparent;border:none;outline:none;font-size:12px;color:var(--txt);flex:1;font-family:var(--sans)"
+              oninput="renderCurateList()"/>
+            <button onclick="document.getElementById('curate-search').value='';renderCurateList()" 
+              style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px;padding:0;line-height:1">×</button>
+          </div>
+        </div>
         <div style="display:flex;flex:1;overflow:hidden;">
           <div class="list-panel" id="curate-list"></div>
           <div style="flex:1;display:flex;overflow:hidden;" id="curate-detail-wrap">
@@ -837,7 +847,13 @@ function renderCurateList(){
     }).join('');
     return;
   }
-  const filtered=state.notes.filter(n=>n.status===f);
+  const q=(document.getElementById('curate-search')?.value||'').toLowerCase().trim();
+  const matchQ=n=>!q||q.length<2||(n.title||'').toLowerCase().includes(q)||
+    (n.sector_code||'').toLowerCase().includes(q)||
+    (n.geo_country||'').toLowerCase().includes(q)||
+    ((n.structured_data||{}).core_insight||'').toLowerCase().includes(q)||
+    ((n.structured_data||{}).pattern_name||'').toLowerCase().includes(q);
+  const filtered=state.notes.filter(n=>n.status===f&&matchQ(n));
   const whispers=filtered.filter(n=>n.note_type==='WHISPER_NOTE');
   const cards=filtered.filter(n=>n.note_type==='KNOWLEDGE_CARD');
   const el=document.getElementById('curate-list');
@@ -845,8 +861,8 @@ function renderCurateList(){
   if(!filtered.length){
     html=`<div class="empty-list">No items in "${f}"</div>`;
   } else {
+    if(cards.length){html+=`<div class="list-section-hdr" style="color:var(--accent-txt)">◉ KNOWLEDGE CARDS · ${cards.length}</div>`;cards.forEach(n=>html+=listItemHTML(n));}
     if(whispers.length){html+=`<div class="list-section-hdr" style="color:var(--faint)">WHISPERS · ${whispers.length}</div>`;whispers.forEach(n=>html+=listItemHTML(n));}
-    if(cards.length){html+=`<div class="list-section-hdr" style="color:var(--blue-txt)">KNOWLEDGE CARDS · ${cards.length}</div>`;cards.forEach(n=>html+=listItemHTML(n));}
   }
   el.innerHTML=html;
 }
