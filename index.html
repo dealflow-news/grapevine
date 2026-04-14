@@ -1514,7 +1514,7 @@ function renderKB(){
         ${f==='direct'?`<span class="badge" style="color:var(--sage-txt);background:var(--sage-dim)">🎯 Direct</span>`:''}
         ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
       </div>
-      <div class="kb-card-title">${icon}${c.title||'(untitled)'}</div>
+      <div class="kb-card-title">${c.status==='draft'?'<span style="font-size:9px;background:var(--gold-dim);color:var(--gold-txt);padding:1px 5px;border-radius:3px;margin-right:4px;font-family:var(--mono)">DRAFT</span>':''}${icon}${c.title||'(untitled)'}</div>
       <div class="kb-card-excerpt">${truncate(sd.core_insight||c.summary_short||'',90)}</div>
       ${(sd.source_access?.author)?`<div style="font-size:10px;color:var(--faint);font-family:var(--mono);margin-top:5px">${sd.source_access.author.split(',')[0].split(';')[0].trim()}</div>`:''}
     </div>`;
@@ -1609,6 +1609,11 @@ function selectKB(id){
       ${sd.deal_implication?`<div class="section">${sl('Deal Implication')}<div style="font-size:12px;color:var(--muted);line-height:1.65">${sd.deal_implication}</div></div>`:''}
       ${sd.misread_risk?`<div class="section">${sl('⚠ Misread Risk','var(--amber)')}<div class="warning-block">${sd.misread_risk}</div></div>`:''}
       ${sd.best_use&&sd.best_use.length?`<div class="section">${sl('Best Use')}<div class="pill-row">${sd.best_use.map(u=>pill(u)).join('')}</div></div>`:''}
+      ${!sd.core_insight&&!sd.deal_implication?`
+        <div style="background:var(--gold-dim);border:1px solid var(--gold);border-radius:6px;padding:14px 16px;margin:8px 0">
+          <div style="font-size:10px;letter-spacing:2px;font-family:var(--mono);color:var(--gold-txt);text-transform:uppercase;margin-bottom:6px">◉ Draft — not yet enriched</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6">Go to <strong>Curate → Drafts</strong> and click <strong>◉ Extract Card</strong> to run AI enrichment on this card.</div>
+        </div>`:''}
       ${sourceBlock}
     </div>
     <div class="kb-detail-footer"><div class="actions">
