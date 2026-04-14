@@ -759,11 +759,11 @@ async function sbGet(table, params={}) {
 async function sbPost(table, data) {
   const r = await fetch(`${URL_BASE}/${table}`, {
     method: 'POST',
-    headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
     body: JSON.stringify(data)
   });
   if (![200,201,204].includes(r.status)) throw new Error(`POST ${table}: ${r.status} ${await r.text()}`);
-  return true;
+  try { return await r.json(); } catch { return true; }
 }
 
 async function sbPatch(table, filter, data) {
