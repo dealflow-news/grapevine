@@ -1699,6 +1699,34 @@ function openKBEditMode(id){
         <label class="edit-label">Canonical URL</label>
         <input class="edit-input" id="kbef-url" placeholder="https://publisher.com/..." value="${(sa.canonical_url||'').replace(/"/g,'&quot;')}">
       </div>
+      <div class="edit-field">
+        <label class="edit-label">Source Reference <span style="color:var(--faint);font-weight:normal">(APA citation or extra summary)</span></label>
+        <textarea class="edit-input edit-textarea" id="kbef-sourcebox" rows="3"
+          placeholder="e.g. Koller, T., Goedhart, M. & Wessels, D. (2020). Valuation (7th ed.). Wiley.
+Or: extra editorial summary / reading notes…"
+          style="min-height:70px">${(sd.source_box||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+      </div>
+      ${(sd.storage_url||sa.storage_url)?`
+      <div class="edit-field">
+        <label class="edit-label">Document</label>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg-code);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+          <span style="font-size:11px;color:var(--accent);font-family:var(--mono);flex:1">📄 ${(sd.storage_url||sa.storage_url).split('/').pop()}</span>
+          <a href="#" onclick="openStorageDoc('${sd.storage_url||sa.storage_url}');return false;"
+             style="font-size:10px;color:var(--accent);border:1px solid var(--accent-dim);border-radius:3px;padding:2px 8px;text-decoration:none">Open ↗</a>
+        </div>
+      </div>`:''}
+      <div class="edit-field">
+        <label class="edit-label">Upload PDF <span style="color:var(--faint);font-weight:normal">(replaces existing document)</span></label>
+        <div style="border:1px dashed var(--border);border-radius:6px;padding:10px;text-align:center;cursor:pointer;position:relative;background:var(--bg-r)"
+             id="kbef-dropzone"
+             ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+             ondragleave="this.style.borderColor='var(--border)'"
+             ondrop="handleKBFileDrop(event,'${id}')">
+          <input type="file" accept=".pdf,.docx" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%"
+                 onchange="handleKBFileSelect(event,'${id}')"/>
+          <span style="font-size:11px;color:var(--faint);font-family:var(--mono)" id="kbef-file-status">Drop PDF here or click to browse</span>
+        </div>
+      </div>
     </div>
   </div>`;
   const footer=`<div class="kb-detail-footer"><div class="actions">
@@ -1718,6 +1746,7 @@ async function saveKBEdit(id){
   const author=document.getElementById('kbef-author')?.value.trim()||'';
   const isbn=document.getElementById('kbef-isbn')?.value.trim()||'';
   const url=document.getElementById('kbef-url')?.value.trim()||'';
+  const sourcebox=document.getElementById('kbef-sourcebox')?.value.trim()||'';
   const newSd={
     ...existingSd,
     kb_quality:{...existingKbq,tier,benelux_fit:fit},
@@ -1728,6 +1757,7 @@ async function saveKBEdit(id){
       canonical_url:url||existingSa.canonical_url||null,
       access_type:(url||existingSa.canonical_url)?'canonical_only':'none',
     },
+    source_box: sourcebox||existingSd.source_box||null,
   };
   const patch={
     title:            document.getElementById('kbef-title').value.trim(),
@@ -2057,6 +2087,64 @@ if(KEY){
   document.getElementById('stat-active').textContent='—';
   document.getElementById('stat-cards').textContent='—';
   showToast('No Supabase key — offline mode. Add key to CONFIG block.','warn');
+}
+
+
+// ── KB PDF Upload (Edit panel) ────────────────────────────────────────────
+function handleKBFileDrop(e, noteId){
+  e.preventDefault();
+  document.getElementById('kbef-dropzone').style.borderColor='var(--border)';
+  const file=[...e.dataTransfer.files].find(f=>/\.(pdf|docx)$/i.test(f.name));
+  if(file) uploadKBDoc(file, noteId);
+}
+function handleKBFileSelect(e, noteId){
+  const file=e.target.files[0];
+  if(file) uploadKBDoc(file, noteId);
+}
+
+async function uploadKBDoc(file, noteId){
+  const statusEl=document.getElementById('kbef-file-status');
+  if(statusEl) statusEl.textContent='⏳ Uploading…';
+  try{
+    // Upload to Supabase Storage bucket grapevine-docs/standards/
+    const folder=file.name.match(/ivs|evs|standard/i)?'standards':'library';
+    const path=`${folder}/${noteId.slice(0,8)}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const SUPABASE_BASE=URL_BASE.replace('/rest/v1','');
+    const uploadUrl=`${SUPABASE_BASE}/storage/v1/object/grapevine-docs/${path}`;
+    const r=await fetch(uploadUrl,{
+      method:'POST',
+      headers:{
+        'apikey':KEY,
+        'Authorization':`Bearer ${KEY}`,
+        'Content-Type':file.type||'application/octet-stream',
+        'x-upsert':'true',
+      },
+      body:file,
+    });
+    if(!r.ok){
+      const txt=await r.text();
+      throw new Error(`Storage ${r.status}: ${txt.slice(0,120)}`);
+    }
+    // Patch note with storage_url
+    const n=state.notes.find(x=>x.note_id===noteId);
+    const existingSd=(n&&n.structured_data)||{};
+    const existingSa=existingSd.source_access||{};
+    const newSd={
+      ...existingSd,
+      storage_url: path,
+      source_access:{...existingSa, storage_url:path, access_type:'both'},
+    };
+    await sbPatch('grapevine_notes',{'note_id':`eq.${noteId}`},{structured_data:newSd});
+    if(n) n.structured_data=newSd;
+    if(statusEl) statusEl.textContent=`✓ Uploaded: ${file.name}`;
+    showToast(`✓ Document uploaded — ${file.name}`);
+    // Re-render edit panel to show new doc link
+    setTimeout(()=>openKBEditMode(noteId), 800);
+  }catch(e){
+    if(statusEl) statusEl.textContent=`✗ Upload failed`;
+    showToast('Upload failed: '+e.message,'error');
+    console.error('KB upload error',e);
+  }
 }
 
 async function openStorageDoc(path){
