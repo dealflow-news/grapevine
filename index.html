@@ -977,9 +977,10 @@ function showCurateDetail(n){
     const isPatternCandidate = !!(n.structured_data||{}).pattern_candidate &&
       !state.notes.some(x=>x.note_type==='KNOWLEDGE_CARD'&&!x.is_deleted&&
         (x.source_ref_id===n.note_id||(x.derived_from||[]).some(d=>d.id===n.note_id)));
+    const needsExtract = n.note_type==='KNOWLEDGE_CARD' && !((n.structured_data||{}).core_insight);
     footer += `
       <button class="btn-primary" onclick="openPromoteModal('${n.note_id}')">↑ Promote</button>
-      ${isPatternCandidate ? `<button class="btn-extract" onclick="extractCard('${n.note_id}')" title="Extract Knowledge Card via AI">◉ Extract Card</button>` : ''}
+      ${(isPatternCandidate||needsExtract) ? `<button class="btn-extract" onclick="extractCard('${n.note_id}')" title="Extract Knowledge Card via AI">◉ Extract Card</button>` : ''}
       <button class="btn-edit"    onclick="openEditMode('${n.note_id}')">✎ Edit</button>
       <button class="btn-ghost"   onclick="archiveNote('${n.note_id}')">Archive</button>
       <button class="btn-delete"  onclick="deleteNote('${n.note_id}')" title="Delete this note" style="margin-left:auto">🗑</button>`;
@@ -987,9 +988,10 @@ function showCurateDetail(n){
     const isPatternCandidateA = !!(n.structured_data||{}).pattern_candidate &&
       !state.notes.some(x=>x.note_type==='KNOWLEDGE_CARD'&&!x.is_deleted&&
         (x.source_ref_id===n.note_id||(x.derived_from||[]).some(d=>d.id===n.note_id)));
+    const needsExtractA = n.note_type==='KNOWLEDGE_CARD' && !((n.structured_data||{}).core_insight);
     footer += `
       <div class="status-active-badge" style="flex:1">✓ Active</div>
-      ${isPatternCandidateA ? `<button class="btn-extract" onclick="extractCard('${n.note_id}')" title="Extract Knowledge Card via AI">◉ Extract Card</button>` : ''}
+      ${(isPatternCandidateA||needsExtractA) ? `<button class="btn-extract" onclick="extractCard('${n.note_id}')" title="Extract Knowledge Card via AI">◉ Extract Card</button>` : ''}
       <button class="btn-edit"  onclick="openEditMode('${n.note_id}')">✎ Edit</button>
       <button class="btn-ghost" onclick="archiveNote('${n.note_id}')">Archive</button>`;
   } else {
@@ -1628,7 +1630,7 @@ function selectKB(id){
       ${!sd.core_insight&&!sd.deal_implication?`
         <div style="background:var(--gold-dim);border:1px solid var(--gold);border-radius:6px;padding:14px 16px;margin:8px 0">
           <div style="font-size:10px;letter-spacing:2px;font-family:var(--mono);color:var(--gold-txt);text-transform:uppercase;margin-bottom:6px">◉ Draft — not yet enriched</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.6">Go to <strong>Curate → Drafts</strong> and click <strong>◉ Extract Card</strong> to run AI enrichment on this card.</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6">Open this card in <strong>Curate</strong> and click <strong>◉ Extract Card</strong> to run AI enrichment.</div>
         </div>`:''}
       ${sourceBlock}
     </div>
