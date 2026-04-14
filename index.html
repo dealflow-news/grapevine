@@ -1527,22 +1527,10 @@ function getDomain(n){
 
 
 // Domain display labels (canonical ld_* keys → display label)
-const DOMAIN_LABELS={
-  'ld_sector_heatmaps':         '01 — Sector Deep Dives',
-  'ld_strategic_narratives':    '02 — Strategic Narratives',
-  'ld_thought_leadership':      '02b — Thought Leadership',
-  'ld_playbooks_training':      '03 — M&A Playbooks',
-  'ld_editorial_newsfeeds':     '09 — Editorial & Signals',
-  'ld_valuation_capital':       '04 — Valuation & Capital',
-  'ld_investor_models_pe':      '05 — PE & Investor Models',
-  'ld_search_ebo':              '06 — ETA & Buyouts',
-  'ld_buyer_investor_psychology':'07 — Buyer Psychology',
-  'ld_trends_benchmarking':     '08 — Trends & Reports',
-  'ld_insights_library':        '◈ Patterns & Standards',
-};
+// Domain order drives display sequence — labels use matching numbers
 const DOMAIN_ORDER=[
-  'ld_playbooks_training',
   'ld_sector_heatmaps',
+  'ld_playbooks_training',
   'ld_valuation_capital',
   'ld_investor_models_pe',
   'ld_search_ebo',
@@ -1553,6 +1541,19 @@ const DOMAIN_ORDER=[
   'ld_editorial_newsfeeds',
   'ld_insights_library',
 ];
+const DOMAIN_LABELS={
+  'ld_sector_heatmaps':          '01 — Sector Deep Dives',
+  'ld_playbooks_training':       '02 — M&A Playbooks',
+  'ld_valuation_capital':        '03 — Valuation & Capital',
+  'ld_investor_models_pe':       '04 — PE & Investor Models',
+  'ld_search_ebo':               '05 — ETA & Buyouts',
+  'ld_buyer_investor_psychology': '06 — Buyer Psychology',
+  'ld_strategic_narratives':     '07 — Strategic Narratives',
+  'ld_thought_leadership':       '08 — Thought Leadership',
+  'ld_trends_benchmarking':      '09 — Trends & Reports',
+  'ld_editorial_newsfeeds':      '10 — Editorial & Signals',
+  'ld_insights_library':         '◈ Insights & Standards',
+};
 
 function closeKBDetail(){
   state.selectedKBId=null;
