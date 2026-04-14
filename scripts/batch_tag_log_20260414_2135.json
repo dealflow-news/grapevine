@@ -1,0 +1,2049 @@
+[
+  {
+    "note_id": "e8057e98-7fd3-47a8-b34d-01441585f26e",
+    "title": "Knowledge Grapevine Taxonomy v1.2: M&A Knowledge OS Architecture",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_governance_alignment"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "0db2a1de-f058-43f2-af3d-1494509fc843",
+    "title": "EU SME Acquisitions: Most Deals Destroy Rather Than Create Value",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_post_merger_integration"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_consolidation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "991a6ef7-b99d-4639-a49b-24fe6e4a7485",
+    "title": "Platform vs Add-On Acquisitions in Private Equity",
+    "kb_tags": {
+      "library_domain": "ld_investor_models_pe",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_pe_investing",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_platform_build",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "d4374ec4-ba92-48d0-87ba-22165c44a1b6",
+    "title": "Bain Global M&A Report 2024: Market Reset & Emerging Deal Themes",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_digital_enablement",
+        "th_regulatory_complexity"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "7175d37e-1488-4524-8121-9bf03f385248",
+    "title": "2024 M&A Recovery: Creative Structures, ESG and Cautious Optimism",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_esg_transition",
+        "th_market_timing"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "138ce42b-54b2-4f30-945d-a8c09bd51106",
+    "title": "Belgian M&A Survey 2024: Market Outlook and Key Trends",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_benchmark",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_valuation_pricing",
+        "th_esg_transition",
+        "th_key_person_dependency"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "34c3b0cf-fb8e-45c1-b704-755cc88c9bd9",
+    "title": "Benelux M&A Outlook 2025: Growth & Innovation Cross-Sector",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_platform_build",
+        "th_digital_enablement"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "fecfeb96-990c-4141-822a-56e235a03da7",
+    "title": "EMEA 2025 M&A Revival: Regional Heat Charts and Benelux Positioning",
+    "kb_tags": {
+      "library_domain": "ld_sector_heatmaps",
+      "asset_type": "ka_market_map",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_geographic_expansion"
+      ],
+      "sector": [
+        "sc_software_it",
+        "sc_industrials"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "81bd4812-4f5f-426d-99d6-f162799d981a",
+    "title": "M&A 2025 Outlook: Cautious Optimism and Disciplined Deal-Making",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_market_timing",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_software_it",
+        "sc_energy_infra"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "83f60f87-8f7e-4ac4-bdfb-bde1f774493b",
+    "title": "Belgian M&A 2024 Outlook: Cross-Sector Predictions by Deloitte",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_digital_enablement",
+        "th_energy_transition"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "8a404302-0696-44a2-a782-f07acbe67bfe",
+    "title": "16 Capital Sources for Benelux Business Financing: Pros and Cons",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_growth_capital"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "c1424dbc-3220-4157-8f71-d189557c3cda",
+    "title": "Board Oversight Framework for M&A: Three-Phase Director Guide",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_post_merger_integration",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_governance_alignment",
+        "th_value_creation",
+        "th_platform_build"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "bbcabc2e-2486-4bb6-99bb-de35144af17f",
+    "title": "M&A Essentials: Practical Process Guide for All Stakeholders",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "d56f0c21-261c-493a-8b2b-459db798fd4d",
+    "title": "Capital Gains Tax Implications for SME Exit Planning Benelux",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_succession_transition"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "e109cc75-b3a1-4aca-ac98-09eeca3fddba",
+    "title": "Quality of Earnings: Separating Core from Non-Core Earnings",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "6dbff153-6e09-42bf-8aeb-b49aed5cec9d",
+    "title": "M&A Essentials: Practical Guide for Buyers, Sellers and Advisors",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "4a8ce78e-490d-4e1c-a43e-ce61f235fb88",
+    "title": "Ventures4Growth: 16-Industry Buy-and-Build Framework Benelux",
+    "kb_tags": {
+      "library_domain": "ld_sector_heatmaps",
+      "asset_type": "ka_market_map",
+      "ma_lens": [
+        "ml_pe_investing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_platform_build",
+        "th_consolidation"
+      ],
+      "sector": [
+        "sc_industrials",
+        "sc_food_agri"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "be33971e-3488-4042-b277-71f98ef3208b",
+    "title": "EU SME Acquisitions: Value Creation & PMI Study 2007–2017",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_post_merger_integration"
+      ],
+      "strategic_themes": [
+        "th_platform_build",
+        "th_value_creation",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "167ed746-83bd-4d39-99f0-da34961cb419",
+    "title": "Bain Global M&A Report 2024: Market Reset and Deal Trends",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_regulatory_complexity",
+        "th_digital_enablement"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "f339995c-bb3c-409c-926d-d77cc120f2ea",
+    "title": "2024 M&A Outlook: Creative Structures Bridge Valuation Gaps",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_valuation_pricing",
+        "th_esg_transition"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "b8098a30-1b10-4ead-bec5-b023792c763c",
+    "title": "Belgian M&A Survey 2024: Market Outlook, Pricing & Key Trends",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_benchmark",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_esg_transition",
+        "th_talent_retention",
+        "th_market_timing"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "8ab437c5-02b0-47b4-b3ba-a81e01dfc9b3",
+    "title": "Benelux M&A Outlook 2025: Growth & Innovation Cross-Sector",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_platform_build",
+        "th_digital_enablement",
+        "th_market_timing"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "c348a1c2-6eeb-48fb-9ccd-bc3a638c61f7",
+    "title": "EMEA 2025 M&A Revival: Regional Heatmaps and Deal Driver Outlook",
+    "kb_tags": {
+      "library_domain": "ld_sector_heatmaps",
+      "asset_type": "ka_market_map",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_consolidation",
+        "th_platform_build"
+      ],
+      "sector": [
+        "sc_software_it",
+        "sc_industrials"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "192ce75f-c9f5-4082-9781-6e2929ef5d90",
+    "title": "M&A 2025 Outlook: Cautious Optimism in a Buyers' Market",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_market_timing",
+        "th_valuation_pricing"
+      ],
+      "sector": [
+        "sc_software_it",
+        "sc_energy_infra"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "0f5dc586-0f1b-47a0-9f38-7e2359866770",
+    "title": "Belgian M&A 2024: Deloitte Cross-Sector Investor & Sector Outlook",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_buyer_psychology",
+        "th_esg_transition"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "06dd06e8-fd32-4853-8e55-c8e329a4d166",
+    "title": "Belgium CGT 2026: Valuation Strategy for Business Owners Pre-Reform",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_succession"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_succession_transition",
+        "th_market_timing"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "b20d2a1b-06a8-4d41-b9b3-28f50bdf0d46",
+    "title": "Founder's Succession Dilemma: Exit Prep Destroys What It Sells",
+    "kb_tags": {
+      "library_domain": "ld_thought_leadership",
+      "asset_type": "ka_thesis",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_succession"
+      ],
+      "strategic_themes": [
+        "th_founder_psychology",
+        "th_succession_transition",
+        "th_key_person_dependency"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "9b7a7792-07d2-49bf-93eb-c816a3685a75",
+    "title": "Building Advantaged Acquirer Capabilities as Repeatable M&A Competence",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_platform_build"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "82894158-05f2-4604-ba5e-d3e8f9a3fe58",
+    "title": "16 Capital Sources for SME Financing: Pros and Cons",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_mbo_mbi"
+      ],
+      "strategic_themes": [
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "26b6d2ec-0e33-4d10-9c46-6600f12e7fd7",
+    "title": "Board Oversight Framework for M&A: Three-Phase Director Guide",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_governance_alignment",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "9976dc9f-b567-4339-9980-571ed47597a0",
+    "title": "Strategic & Psychological Preparation for M&A Success",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_post_merger_integration",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_talent_retention",
+        "th_governance_alignment"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "fac60794-b713-45a2-b169-a1d1de38a34b",
+    "title": "Quality of Earnings: Separating Core from Non-Core Earnings",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "a763bf90-e002-4867-94e6-43d9e3f86b48",
+    "title": "Coaching Habit: Seven Questions to Build Self-Sufficient Teams",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_post_merger_integration",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_key_person_dependency",
+        "th_talent_retention",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "5a2a3da4-d95a-4661-b0e8-c06ce75fe68c",
+    "title": "M&A Essentials: Practical Guide for Buyers, Sellers, Advisors",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_process_execution",
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "06476caf-5217-4b33-8a80-58e9a4e4aebb",
+    "title": "Capital Gains Tax Implications for SME Exits in Benelux",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_succession_transition"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "88de2186-6450-4ab8-823d-5df2a9463653",
+    "title": "E.ON–RWE Asset Swap: PMI Execution in Complex Energy Restructuring",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_case_note",
+      "ma_lens": [
+        "ml_post_merger_integration",
+        "ml_carveout"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_talent_retention",
+        "th_regulatory_complexity"
+      ],
+      "sector": [
+        "sc_energy_infra"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "d9e46b9e-3916-49ff-8d12-6f3fec602d4b",
+    "title": "E.ON–RWE Asset Swap: Complex PMI Execution at Scale",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_case_note",
+      "ma_lens": [
+        "ml_post_merger_integration",
+        "ml_carveout"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_talent_retention",
+        "th_governance_alignment"
+      ],
+      "sector": [
+        "sc_energy_infra"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "4085cee9-d6b0-4ca8-aed9-a90c4432e4c1",
+    "title": "Strategic Due Diligence: Process, Risk Mitigation & Value Protection",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "380b1432-d37d-4094-90ab-9ffcb9788571",
+    "title": "Five-Step M&A Process: Due Diligence Execution Guide",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "c12dd930-76d7-4d18-9ef7-ec13058ac73b",
+    "title": "Five-Step M&A Process: Due Diligence Guide for Executives",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_key_person_dependency"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "449513bb-fa49-44e1-8a49-07d0ea2ffd51",
+    "title": "30 Years of Middle-Market Exit Lessons: Competitive Process Wins",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_pattern",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "648b14ba-e3a5-45d0-81d1-d13c19c0d522",
+    "title": "EU SME Business Transfer Ecosystem: Policy Framework & Key Ingredients",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_succession"
+      ],
+      "strategic_themes": [
+        "th_succession_transition",
+        "th_founder_psychology",
+        "th_governance_alignment"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "5e02cd56-a5ac-47f9-bb2a-e4cadf7529f5",
+    "title": "Buy-Side M&A Playbook for Middle-Market Acquisitions",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "93ed4596-d012-4bbb-83f3-b0c516ebdbb4",
+    "title": "Buy-Side Search Playbook: Target Definition to Close",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_search_fund"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_process_execution",
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "1eaeea3a-50c7-48a6-a6f7-f57c7973350b",
+    "title": "Sell-Side Divestiture Strategy: Trade Sale Execution Framework",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_succession_transition",
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "7e083d2f-efdb-4975-98a4-16701c95ebcc",
+    "title": "Sell-Side M&A Process: Owner Preparation & Advisory Guide",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_succession_transition",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "f9e52246-2b3c-4322-8e21-0ac073042e9c",
+    "title": "Debt vs Equity: Optimal Capital Structure Fundamentals for M&A",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_value_creation"
+      ],
+      "sector": []
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "b7b49db0-dbde-470c-8208-6e4943dc773a",
+    "title": "7-Step MBI Playbook for Cross-Sector Business Acquisition",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_mbo_mbi",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_governance_alignment"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "584642db-ee04-4ec0-b325-c542ab11a379",
+    "title": "Belgian SME Resilience: Growth Plans Intact Amid Economic Volatility 2025",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_signal_digest",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_digital_enablement",
+        "th_talent_retention",
+        "th_esg_transition"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "cde2f0d9-13e2-4d3d-81d3-dfd7792d749a",
+    "title": "Equity Split Negotiation Framework for Management Buyout Teams",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_mbo_mbi",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_governance_alignment",
+        "th_talent_retention",
+        "th_capital_structure"
+      ],
+      "sector": []
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "02d885c4-561b-486b-9a49-9620973ddb82",
+    "title": "Venture Scaling Cycle: Start-up to Scale-up Framework",
+    "kb_tags": {
+      "library_domain": "ld_investor_models_pe",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_growth_capital",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_key_person_dependency",
+        "th_governance_alignment",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_software_it"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "16edd475-ccbc-4a69-aa46-450653034c9c",
+    "title": "Venture Growth Phases Framework: Financing & Exit Readiness",
+    "kb_tags": {
+      "library_domain": "ld_investor_models_pe",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_growth_capital",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_capital_structure",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "6c9e9631-1d24-4a08-bcdc-584e8d2a34a2",
+    "title": "Search Funds as Asset Class: Returns, Model and Opportunity",
+    "kb_tags": {
+      "library_domain": "ld_investor_models_pe",
+      "asset_type": "ka_thesis",
+      "ma_lens": [
+        "ml_search_fund",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_succession_transition",
+        "th_buyer_psychology",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "362a3e14-8678-4f1c-9fc6-dabfd3293567",
+    "title": "Ten Core Startup Revenue Models: Classification Framework",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_recurring_revenue",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_software_it",
+        "sc_business_services"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "281e596c-d7dd-4768-94e1-d819eabd3d48",
+    "title": "Family Enterprise Time Travel Frameworks for Succession Planning",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_succession"
+      ],
+      "strategic_themes": [
+        "th_succession_transition",
+        "th_founder_psychology",
+        "th_governance_alignment"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "bbc7537b-25f9-4f72-89ec-61cba2a5dc28",
+    "title": "Klavertje 4: Four-Leaf Framework for SME Acquisition Success",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_search_fund"
+      ],
+      "strategic_themes": [
+        "th_talent_retention",
+        "th_key_person_dependency",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "b5affa99-5726-4364-af14-32e932f8a00e",
+    "title": "Top M&A Resources Roundup for Founders, Buyers & Advisors",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_founder_psychology",
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "2b405c58-d2db-41aa-95cb-2418ff75964d",
+    "title": "Damodaran's Three-Decision Corporate Finance Framework Explained",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "0f099ef4-9686-4d13-8754-49adea1260d4",
+    "title": "Equity Risk Premiums: Determinants, Estimation and Implications 2022",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_market_timing"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "fff3740f-1ef8-4995-be6b-15f183074ebf",
+    "title": "Argos Mid-Market Index Eurozone Q4 2015 Valuation Multiples",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_benchmark",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "ec19a335-54c3-4f3d-98eb-8eac5fa37573",
+    "title": "NPV vs EBITDA: Founder-Centric Valuation Explanation Framework",
+    "kb_tags": {
+      "library_domain": "ld_buyer_investor_psychology",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_founder_psychology",
+        "th_valuation_pricing",
+        "th_succession_transition"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "f6682188-14d6-4288-86db-859e8259fa08",
+    "title": "DCF vs. Multiples: Valuation Theory and Evidence Survey",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_succession_transition",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "8c0f147d-8a39-438e-8364-5b10bcf33eec",
+    "title": "Damodaran Hurdle Rate & Cash Flow Valuation First Principles",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_capital_structure",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "dc1d065c-a45b-4ca3-9d4e-84bc62d47442",
+    "title": "Dividend Discount Models: Equity Valuation From First Principles",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "0a0a2aca-19f3-446c-818a-4689ffb86e7f",
+    "title": "FCFE Model: Measuring True Equity Cash Flow for Valuation",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "8fd2bb35-b5a6-4d2b-bed2-763eb61ea558",
+    "title": "FCFF & APV: Firm Valuation via Cost of Capital Framework",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "8cc56bb0-1504-4aaa-a263-b28938a6131c",
+    "title": "Valuation & Business Modelling: Cross-Sector Reference Manual",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "a55fbea8-2c1e-42cf-baaa-f88e5ffec7da",
+    "title": "DCF Fundamentals Shift Across Company Life-Cycle Stages",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "660fdf1c-556f-4724-b3d6-94c827841271",
+    "title": "Everything Is a DCF Model: Cash Flow Valuation Primer",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "59b27754-b9c8-4d0d-8d74-94be9f735dd7",
+    "title": "McKinsey Valuation: Measuring & Managing Company Value Framework",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "0d33e932-b4a2-455d-a1a3-1e47b7c41f3a",
+    "title": "Private Company Valuation: Methods, Challenges and Motive Matters",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "e4065187-01ec-43bd-a7fb-227c64d79113",
+    "title": "Four-Step Relative Valuation Framework for Multiples Analysis",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "e8506717-a957-4b1b-96c6-c34c0ce47cc3",
+    "title": "Terminal Value Estimation: Stable Growth and Liquidation Approaches",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "5a9ffec3-f074-4894-b0ee-63452b905db2",
+    "title": "Trading Comparables & Peer Group Analysis for M&A Valuation",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "dbef5eef-b82c-473a-b179-d3d78ad856f8",
+    "title": "Valuing Young & Growth Companies: Estimation Issues and Frameworks",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_growth_capital"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_key_person_dependency"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "c8361c59-4615-410a-b640-cb296c74daca",
+    "title": "Alternative Financing Forms for Benelux SMEs Beyond Bank Credit",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_growth_capital",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "e52149e4-000e-426c-b320-8b47dc71517f",
+    "title": "IPS Framework for Managing Direct Investment Deal Flow",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_platform_build"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "a5bd2fcb-5ef3-417d-b42b-b578cbe44476",
+    "title": "Subordinated Debt & Growth Financing Landscape Benelux 2018",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_market_map",
+      "ma_lens": [
+        "ml_growth_capital",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_platform_build"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "6b07abac-f4d6-45a3-8ca4-fa2b785e90f0",
+    "title": "Investment Philosophy: Core Beliefs Drive Consistent Investor Behaviour",
+    "kb_tags": {
+      "library_domain": "ld_buyer_investor_psychology",
+      "asset_type": "ka_thesis",
+      "ma_lens": [
+        "ml_pe_investing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_governance_alignment"
+      ],
+      "sector": []
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "b3e4cedc-e729-4f6b-847b-2d3f8f622076",
+    "title": "Flemish Venture Capital Landscape: Public, Private & Crowdfunding Providers",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_market_map",
+      "ma_lens": [
+        "ml_growth_capital",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "f76d9dd5-94ec-4d36-8497-94fd3354fbbd",
+    "title": "Venture Financing Toolkit for Benelux Cross-Sector Deals",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_template",
+      "ma_lens": [
+        "ml_growth_capital",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_buyer_psychology",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "8078e13b-6472-4988-917b-3444710c4f83",
+    "title": "Venture Capital Deal Terms & Structuring Guide Benelux",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_growth_capital",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_founder_psychology",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "6e69076f-f93b-4cdd-b3c4-d6c15e69fa4b",
+    "title": "Corporate Life Cycle Drives Valuation Logic Across Growth Stages",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "9ede4948-553a-42d3-a5c7-846bcc90336c",
+    "title": "Search Fund Primer: Practical Guide for Aspiring Entrepreneur-Buyers",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_search_fund",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_succession_transition",
+        "th_buyer_psychology",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "18af4509-561e-415c-b949-4b7ea26eefed",
+    "title": "Stanford Search Fund Study 2011: 34.4% IRR Asset Class Benchmark",
+    "kb_tags": {
+      "library_domain": "ld_investor_models_pe",
+      "asset_type": "ka_benchmark",
+      "ma_lens": [
+        "ml_search_fund",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "8adcbc15-3feb-4ff3-8792-000c7bb4689a",
+    "title": "Search Fund Formation: PPM, LLC Structure & Investor Documentation",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_search_fund",
+        "ml_pe_investing"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_governance_alignment"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "b348c8a5-44f4-4ebd-bbf3-1e4ed811d7b2",
+    "title": "Search Fund PPM: Principal Background & Five-Stage Model",
+    "kb_tags": {
+      "library_domain": "ld_search_ebo",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_search_fund",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_capital_structure"
+      ],
+      "sector": []
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "157ec34a-53d3-40cb-b1c2-60c1ad99ff62",
+    "title": "Search Fund LLC Operating Agreement Template for Benelux Use",
+    "kb_tags": {
+      "library_domain": "ld_search_ebo",
+      "asset_type": "ka_template",
+      "ma_lens": [
+        "ml_search_fund",
+        "ml_process_execution"
+      ],
+      "strategic_themes": [
+        "th_governance_alignment",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "2003c890-ac65-4337-9c3d-96f54cfe38bb",
+    "title": "LOI Essentials: Key Terms and Binding Provisions in M&A",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_playbook",
+      "ma_lens": [
+        "ml_process_execution",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_founder_psychology",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "cb4a4e75-914f-4aa9-88fa-4e7d6272d1a0",
+    "title": "Argos Index Q1 2025: Mid-Market EBITDA Multiples Drop to 9.5x",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_benchmark",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "0a7323de-48ed-4c58-8dcb-c21a4340abb0",
+    "title": "2024 European Venture Capital: Value Over Volume, AI and Exits Lead",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_signal_digest",
+      "ma_lens": [
+        "ml_growth_capital",
+        "ml_valuation_pricing"
+      ],
+      "strategic_themes": [
+        "th_recurring_revenue",
+        "th_market_timing",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_software_it",
+        "sc_healthcare"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "c2e0d708-5ed3-4fa6-ae98-63af415774d9",
+    "title": "Global VC Q1 2025: Capital Concentration, AI Dominance, M&A Exit Records",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_signal_digest",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_growth_capital"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_buyer_psychology",
+        "th_digital_enablement"
+      ],
+      "sector": [
+        "sc_software_it",
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "95f2f32c-477c-49fa-a5f3-a56223340c76",
+    "title": "M&A Advisor Fee Benchmarks: Global 2024-25 Middle Market",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_benchmark",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_market_timing"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "39c08f1c-4c75-4afc-8f8f-68199a71ffdb",
+    "title": "Benelux M&A Outlook 2025: Growth & Innovation",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_consolidation",
+        "th_digital_enablement"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "dcee29d8-2398-4e49-84aa-b53ebc552585",
+    "title": "Benelux M&A Outlook 2025: Path to Growth",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_editorial_angle",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_succession_transition",
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "3b8d2a71-2122-46a5-aa90-6669a5333a88",
+    "title": "France & Benelux Private Capital Market 2021 Mid-Year Breakdown",
+    "kb_tags": {
+      "library_domain": "ld_trends_benchmarking",
+      "asset_type": "ka_benchmark",
+      "ma_lens": [
+        "ml_buy_side",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_market_timing",
+        "th_buyer_psychology",
+        "th_seller_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "84a1cb46-56b2-46e0-a6de-dcd400b46c8e",
+    "title": "Growth Rates and Terminal Value in DCF Valuation",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_value_creation",
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "7ba7597c-0229-4c27-8a43-2ade516e3ab3",
+    "title": "Illiquidity Cost Framework for Valuing Private Business Assets",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "bb61e8a5-eed9-437b-bf72-f44f99a70c2c",
+    "title": "DCF Valuation of Equity in Distressed Firms: Going Concern Pitfalls",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_capital_structure",
+        "th_value_creation"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "091ec39f-97f2-4984-ae55-ac569cd99e40",
+    "title": "Valuing Young and Growth Companies: Estimation Issues Explained",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_library_source",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "87d86543-4d4f-4f8e-b165-7057259137c7",
+    "title": "Valuing European SMEs: Science, Experience & Perceptions Framework",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_sell_side"
+      ],
+      "strategic_themes": [
+        "th_founder_psychology",
+        "th_buyer_psychology",
+        "th_capital_structure"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  }
+]
