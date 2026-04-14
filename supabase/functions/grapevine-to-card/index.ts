@@ -57,7 +57,7 @@ const json = (d: unknown, s = 200) =>
 
 // ── Taxonomy reference (v1.1) ─────────────────────────────────────────────────
 const TAXONOMY_PROMPT = `
-TAXONOMY v1.1 — assign canonical codes only:
+TAXONOMY v1.2 FINAL — assign canonical codes only:
 
 library_domain (exactly 1):
   ld_sector_heatmaps = Sector Deep Dives & Strategic Heatmaps
@@ -85,6 +85,7 @@ asset_type (exactly 1):
   ka_signal_digest = Signal digest (bundled signals)
   ka_thesis = Strategic thesis (explicit investment thesis)
   ka_template = Template / reusable tool
+  ka_checklist = Checklist / decision gate (tied to specific process gate)
 
 ma_lens (1-2, most specific first):
   ml_buy_side = Buy-side (acquirer strategy)
@@ -105,10 +106,14 @@ strategic_themes (1-3 max):
   th_product_expansion = Product / service expansion
   th_vertical_integration = Vertical integration
   th_consolidation = Consolidation / roll-up
+  th_platform_build = Platform / buy-and-build strategy (platform selection + add-ons)
+  th_recurring_revenue = Recurring revenue / contract quality (ARR/MRR, subscription models)
   th_succession_transition = Succession transition
   th_capital_structure = Capital structure (leverage/earn-out)
   th_value_creation = Value creation (post-deal)
   th_governance_alignment = Governance alignment
+  th_key_person_dependency = Key-person dependency (valuation, integration, succession risk)
+  th_talent_retention = Talent retention & team continuity (earn-out, cultural fit)
   th_founder_psychology = Founder / owner psychology
   th_buyer_psychology = Buyer / investor psychology
   th_digital_enablement = Digital / tech enablement
@@ -127,6 +132,7 @@ sector (0-2, sc_multi_sector ONLY if genuinely cross-sector):
   sc_logistics_transport = Logistics / transport
   sc_energy_infra = Energy / infra
   sc_real_estate = Real estate / proptech
+  sc_education_training = Education / training (edtech, corporate training)
   sc_multi_sector = Multi-sector / cross-sector`;
 
 // ── System prompts ────────────────────────────────────────────────────────────
@@ -190,7 +196,7 @@ Deno.serve(async (req: Request) => {
   const path = new URL(req.url).pathname.replace(/.*\/grapevine-to-card/, '') || '/';
 
   if (path === '/health' || path === '/') {
-    return json({ status: 'ok', version: '1.3', anthropic_set: !!AK });
+    return json({ status: 'ok', version: '1.4', anthropic_set: !!AK });
   }
 
   if (req.method !== 'POST') return json({ error: 'POST required' }, 405);
