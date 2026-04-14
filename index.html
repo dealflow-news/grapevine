@@ -1936,6 +1936,7 @@ async function addToQueue(){
     text: fileText || text,  // prefer extracted file text
     file_text: fileText,     // keep separately for AI enrichment
     file_name: state.dropFile?.name||null,
+    file_obj:  state.dropFile||null,   // File object for Storage upload
     source_type:document.getElementById('dp-source-type').value,
     evidence_type:document.getElementById('dp-evidence').value,
     sector:document.getElementById('dp-sector').value,
@@ -2076,24 +2077,29 @@ ${(q.file_text||q.text).slice(0,8000)}`}]
       };
       const created = await sbPost('grapevine_notes',note);
       const newNoteId = created?.[0]?.note_id || null;
-      // Upload PDF to Storage if available
-      if(newNoteId && state.dropFile && state.dropFile.name.match(/\.pdf$/i)){
+      // Upload PDF to Storage if available — use q.file_obj (state.dropFile is cleared after addToQueue)
+      if(newNoteId && q.file_obj && q.file_obj.name.match(/\.(pdf|docx)$/i)){
         try{
-          const folder='library';
-          const path=`${folder}/${newNoteId.slice(0,8)}_${state.dropFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+          const f=q.file_obj;
+          const folder=f.name.match(/ivs|evs|standard/i)?'standards':'library';
+          const path=`${folder}/${newNoteId.slice(0,8)}_${f.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
           const SUPA_BASE=URL_BASE.replace('/rest/v1','');
           const r=await fetch(`${SUPA_BASE}/storage/v1/object/grapevine-docs/${path}`,{
             method:'POST',
-            headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/pdf','x-upsert':'true'},
-            body:state.dropFile,
+            headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':f.type||'application/pdf','x-upsert':'true'},
+            body:f,
           });
           if(r.ok){
             const existingSd=note.structured_data||{};
             await sbPatch('grapevine_notes',{'note_id':`eq.${newNoteId}`},{
               structured_data:{...existingSd, storage_url:path, source_access:{...(existingSd.source_access||{}),storage_url:path,access_type:'both'}}
             });
+            console.log('✓ PDF uploaded to Storage:', path);
+          } else {
+            const errTxt=await r.text();
+            console.warn('PDF upload failed:', r.status, errTxt);
           }
-        }catch(uploadErr){console.warn('PDF Storage upload failed:',uploadErr);}
+        }catch(uploadErr){console.warn('PDF Storage upload error:',uploadErr);}
       }
       ok++;
     }catch(e){
