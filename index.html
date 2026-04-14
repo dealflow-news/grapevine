@@ -1866,8 +1866,7 @@ async function loadFile(file){
       for(let p=1;p<=maxPages;p++){
         const page=await pdf.getPage(p);
         const tc=await page.getTextContent();
-        text+=tc.items.map(i=>i.str).join(' ')+'
-';
+        text+=tc.items.filter(i=>typeof i.str==='string').map(i=>i.str).join(' ')+'\n';
         if(text.length>12000)break;
       }
       state.dropFileText=text.trim().slice(0,12000);
