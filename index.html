@@ -1494,44 +1494,61 @@ function selectMandate(id){
 // 9-domain classifier (client-side, no SQL needed)
 function getDomain(n){
   const sd=n.structured_data||{};
+  // If kb_tags.library_domain already set — use canonical key directly
+  if(sd.kb_tags?.library_domain) return sd.kb_tags.library_domain;
   const ct=sd.card_type||'';
-  if(ct==='pattern')  return '◈ Observed Patterns';
-  if(ct==='standard') return '▣ Valuation Standards';
+  if(ct==='pattern')  return 'ld_insights_library';
+  if(ct==='standard') return 'ld_valuation_capital';
   const t=(n.title||'').toLowerCase();
   const s=(n.sector_code||'').toLowerCase();
-  if(/platform|tirole|contemporary strategy|grant|techno-economic|perez|industry 4|new map|yergin|global value chain|gvc|industrial organization|l.conomie|discontinuous/.test(t))
-    return '01 — Sector Deep Dives';
+  if(/platform|tirole|techno-economic|perez|industry 4|new map|yergin|global value chain|gvc|industrial organization|l.conomie|discontinuous/.test(t))
+    return 'ld_sector_heatmaps';
   if(/narrative economics|shiller|forecasting|tetlock|signal and noise|silver|factfulness|rosling|black swan|fooled by randomness|taleb|thinking in systems|prospective stratégique|godet/.test(t))
-    return '02 — Strategic Narratives & Outlooks';
+    return 'ld_strategic_narratives';
   if(/m.a|merger|acquisition|rosenbaum|deals from hell|bruner|synergy trap|sirower|art of m.a|sherman|integration|fusies|davis|investment banking/.test(t))
-    return '03 — M&A Playbooks & Deal Intelligence';
+    return 'ld_playbooks_training';
   if(/valuation|damodaran|graham|intelligent investor|security analysis|vernimmen|corporate finance|pratt|valuing a business|narrative and numbers/.test(t)||s.includes('valuation'))
-    return '04 — Valuation & Capital Markets';
+    return 'ld_valuation_capital';
   if(/private equity|mastering pe|zeisberger|pe playbook|coffey|king of capital|buyout/.test(t)||s.includes('private equity'))
-    return '05 — PE & Investor Models';
+    return 'ld_investor_models_pe';
   if(/search fund|buy then build|deibel|hbr guide|small business|entrepreneurial|messy marketplace|beshore|seiler tucker|exit rich|succession/.test(t))
-    return '06 — ETA & Entrepreneurial Buyouts';
+    return 'ld_search_ebo';
   if(/psychology|barriers|cognitive|kahneman|thaler|ariely|cialdini|voss|getting to yes|fisher|trusted advisor|maister|malhotra|negotiat|nudge|predictably|wisdom of crowds|gilovich|misbehaving|stone|difficult conversations|weesie|judgment under|heuristics|surowiecki|influence/.test(t))
-    return '07 — Buyer Psychology & Deal Dynamics';
+    return 'ld_buyer_investor_psychology';
   if(/demographic|goodhart|resilience|sheffi|imf|economic outlook|measuring|oecd|competing on analytics|davenport|business intelligence|superforecasting|rise and fall|sharma|second machine age|megatrends|world economy|benchmarking|reports/.test(t)||s.includes('benchmarking'))
-    return '08 — Trends, Benchmarking & Reports';
+    return 'ld_trends_benchmarking';
   if(/manufacturing consent|merchants of doubt|nouveaux chiens|halimi|spectacle|nieuwsfabriek|formation|bachelard|editorial|signal intelligence|media bias/.test(t)||s.includes('editorial'))
-    return '09 — Editorial & Signal Intelligence';
-  return '03 — M&A Playbooks & Deal Intelligence';
+    return 'ld_editorial_newsfeeds';
+  return 'ld_playbooks_training';
 }
 
+
+// Domain display labels (canonical ld_* keys → display label)
+const DOMAIN_LABELS={
+  'ld_sector_heatmaps':         '01 — Sector Deep Dives',
+  'ld_strategic_narratives':    '02 — Strategic Narratives',
+  'ld_thought_leadership':      '02b — Thought Leadership',
+  'ld_playbooks_training':      '03 — M&A Playbooks',
+  'ld_editorial_newsfeeds':     '09 — Editorial & Signals',
+  'ld_valuation_capital':       '04 — Valuation & Capital',
+  'ld_investor_models_pe':      '05 — PE & Investor Models',
+  'ld_search_ebo':              '06 — ETA & Buyouts',
+  'ld_buyer_investor_psychology':'07 — Buyer Psychology',
+  'ld_trends_benchmarking':     '08 — Trends & Reports',
+  'ld_insights_library':        '◈ Patterns & Standards',
+};
 const DOMAIN_ORDER=[
-  '◈ Observed Patterns',
-  '▣ Valuation Standards',
-  '01 — Sector Deep Dives',
-  '02 — Strategic Narratives & Outlooks',
-  '03 — M&A Playbooks & Deal Intelligence',
-  '04 — Valuation & Capital Markets',
-  '05 — PE & Investor Models',
-  '06 — ETA & Entrepreneurial Buyouts',
-  '07 — Buyer Psychology & Deal Dynamics',
-  '08 — Trends, Benchmarking & Reports',
-  '09 — Editorial & Signal Intelligence',
+  'ld_playbooks_training',
+  'ld_sector_heatmaps',
+  'ld_valuation_capital',
+  'ld_investor_models_pe',
+  'ld_search_ebo',
+  'ld_buyer_investor_psychology',
+  'ld_strategic_narratives',
+  'ld_thought_leadership',
+  'ld_trends_benchmarking',
+  'ld_editorial_newsfeeds',
+  'ld_insights_library',
 ];
 
 function closeKBDetail(){
@@ -1667,10 +1684,11 @@ function renderKB(){
       const cards=byDomain[domain];
       if(!cards||!cards.length)return;
       const collapsed=!!state.kbCollapsed[domain];
+      const domainLabel=DOMAIN_LABELS[domain]||domain;
       html+=`<div style="font-size:9px;letter-spacing:.1em;color:var(--accent-txt);font-family:var(--mono);text-transform:uppercase;padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:${collapsed?'2':'8'}px;font-weight:600;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px"
         onclick="state.kbCollapsed[this.dataset.d]=!state.kbCollapsed[this.dataset.d];renderKB()" data-d="${domain}">
         <span style="font-size:10px;color:var(--faint);line-height:1">${collapsed?'▶':'▼'}</span>
-        ${domain} <span style="color:var(--faint);font-weight:normal;margin-left:4px">(${cards.length})</span>
+        ${domainLabel} <span style="color:var(--faint);font-weight:normal;margin-left:4px">(${cards.length})</span>
       </div>`;
       if(!collapsed){
         html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">${cards.map(renderCard).join('')}</div>`;
