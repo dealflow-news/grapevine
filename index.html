@@ -1954,6 +1954,7 @@ async function ingestAll(){
         sector_code:      q.sector||null,
         geo_country:      q.country||null,
         title:            q.title,
+        body:             q.text||'',
         body_md:          q.text||null,
         summary_short:    q.text?q.text.slice(0,300):null,
         language_code:    'en',
