@@ -2221,6 +2221,7 @@ async function ingestBatch(){
       };
       const created=await sbPost('grapevine_notes',note);
       const newNoteId=created?.[0]?.note_id||null;
+      batchLog('  debug: noteId='+(newNoteId?newNoteId.slice(0,8):'NULL')+' file='+(item.file?item.file.name.slice(0,20):'NULL'));
       if(newNoteId && item.file){
         try{
           const f=item.file;
