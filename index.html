@@ -921,9 +921,14 @@ function showCurateDetail(n){
     </div>
     <div class="divider"></div>`;
 
-  // Body — full body_md first, fallback to summary
-  if(n.body_md){
-    html+=`<div class="section">${sl('Intelligence')}<div class="section-body" style="font-size:13px;line-height:1.8">${renderMd(n.body_md.replace(/\\n/g,'\n').slice(0,3000))}${n.body_md.length>3000?'…':''}</div></div>`;
+  // Body — hide raw PDF for enriched KNOWLEDGE_CARDs; show for WHISPER_NOTEs
+  const isEnrichedKC = n.note_type==='KNOWLEDGE_CARD' && !!sd.core_insight;
+  if(!isEnrichedKC && n.body_md){
+    if(n.body_md.length>500 || sd.core_insight){
+      html+=`<div class="section"><details><summary style="font-size:9px;letter-spacing:2px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;cursor:pointer;list-style:none">▶ SOURCE TEXT (${Math.round(n.body_md.length/100)/10}k chars)</summary><div class="section-body" style="font-size:11px;line-height:1.7;color:var(--faint);margin-top:8px;max-height:200px;overflow-y:auto">${renderMd(n.body_md.replace(/\\n/g,'\n').slice(0,3000))}${n.body_md.length>3000?'…':''}</div></details></div>`;
+    } else {
+      html+=`<div class="section">${sl('Intelligence')}<div class="section-body" style="font-size:13px;line-height:1.8">${renderMd(n.body_md.replace(/\\n/g,'\n').slice(0,3000))}${n.body_md.length>3000?'…':''}</div></div>`;
+    }
   } else if(n.summary_short){
     html+=`<div class="section">${sl('Summary')}<div class="section-body">${n.summary_short}</div></div>`;
   }
@@ -2069,7 +2074,27 @@ ${(q.file_text||q.text).slice(0,8000)}`}]
           kb_quality:      q.note_type==='KNOWLEDGE_CARD'?{tier:null,benelux_fit:null}:null,
         },
       };
-      await sbPost('grapevine_notes',note);
+      const created = await sbPost('grapevine_notes',note);
+      const newNoteId = created?.[0]?.note_id || null;
+      // Upload PDF to Storage if available
+      if(newNoteId && state.dropFile && state.dropFile.name.match(/\.pdf$/i)){
+        try{
+          const folder='library';
+          const path=`${folder}/${newNoteId.slice(0,8)}_${state.dropFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+          const SUPA_BASE=URL_BASE.replace('/rest/v1','');
+          const r=await fetch(`${SUPA_BASE}/storage/v1/object/grapevine-docs/${path}`,{
+            method:'POST',
+            headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/pdf','x-upsert':'true'},
+            body:state.dropFile,
+          });
+          if(r.ok){
+            const existingSd=note.structured_data||{};
+            await sbPatch('grapevine_notes',{'note_id':`eq.${newNoteId}`},{
+              structured_data:{...existingSd, storage_url:path, source_access:{...(existingSd.source_access||{}),storage_url:path,access_type:'both'}}
+            });
+          }
+        }catch(uploadErr){console.warn('PDF Storage upload failed:',uploadErr);}
+      }
       ok++;
     }catch(e){
       err++;
