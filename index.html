@@ -1743,7 +1743,7 @@ function selectKB(id){
   const kbq=sd.kb_quality||{};
   kd.classList.add('open');
   if(kgrid)kgrid.style.gridTemplateColumns='1fr';
-  const hasSource=sa.canonical_url||sa.isbn||sa.author||sd.source_box;
+  const hasSource=sa.canonical_url||sa.isbn||sa.author||sd.source_box||sd.storage_url||sa.storage_url;
   const sourceBlock=hasSource?`<div class="section">${sl('Source')}
     <div style="background:var(--bg-code);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:11px;font-family:var(--mono);line-height:2">
       ${sa.author?`<div><span style="color:var(--faint);display:inline-block;width:60px">Author</span><span style="color:var(--txt)">${sa.author}</span></div>`:''}
