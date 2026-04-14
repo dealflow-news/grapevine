@@ -207,6 +207,29 @@ nav{padding:14px 0;flex:1;}
 .dup-warning{background:var(--gold-dim);border:1px solid var(--gold);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--gold-txt);font-family:var(--mono);display:none;}
 .dup-warning.show{display:block;}
 .queue-hdr{font-size:8px;letter-spacing:3px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;margin-bottom:12px;}
+/* ── Batch Import ─────────────────────────────────────────────────────────── */
+.drop-mode-bar{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--bg-e);flex-shrink:0;}
+.drop-mode-btn{padding:9px 20px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--mono);cursor:pointer;border:none;background:transparent;color:var(--faint);border-bottom:2px solid transparent;transition:all .15s;}
+.drop-mode-btn.active{color:var(--accent-txt);border-bottom-color:var(--accent);background:var(--bg-r);}
+.batch-drop-zone{border:2px dashed var(--border);border-radius:10px;padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg-r);position:relative;margin-bottom:20px;}
+.batch-drop-zone:hover,.batch-drop-zone.drag-over{border-color:var(--accent);background:var(--accent-dim);}
+.batch-drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.batch-review-grid{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;}
+.batch-file-row{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:start;padding:12px 14px;background:var(--bg-r);border:1px solid var(--border);border-radius:8px;transition:border-color .15s;}
+.batch-file-row.verdict-skip{opacity:.45;background:var(--bg-e);}
+.batch-file-row.verdict-skip .batch-file-title{text-decoration:line-through;}
+.batch-verdict{font-size:9px;letter-spacing:1px;font-family:var(--mono);padding:2px 7px;border-radius:4px;white-space:nowrap;font-weight:600;}
+.verdict-ingest{background:var(--sage-dim);color:var(--sage-txt);}
+.verdict-review{background:var(--gold-dim);color:var(--gold-txt);}
+.verdict-skip{background:var(--bg-code);color:var(--faint);}
+.batch-file-title{font-size:12px;font-weight:600;color:var(--txt);line-height:1.4;margin-bottom:3px;}
+.batch-file-meta{font-size:10px;color:var(--faint);font-family:var(--mono);}
+.batch-file-reason{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5;}
+.batch-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin:12px 0;}
+.batch-progress-bar{height:100%;background:var(--accent);border-radius:2px;transition:width .3s;}
+.batch-scanning-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-r);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--faint);font-family:var(--mono);}
+.batch-controls{display:flex;gap:8px;align-items:center;padding:12px 0;border-top:1px solid var(--border);margin-top:8px;}
+
 .queue-item{background:var(--bg-r);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;position:relative;}
 .queue-item-title{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:4px;line-height:1.4;padding-right:20px;}
 .queue-item-meta{font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;gap:8px;flex-wrap:wrap;}
@@ -396,7 +419,15 @@ nav{padding:14px 0;flex:1;}
       </div>
 
       <!-- DROP POINT -->
-      <div class="tab" id="tab-drop" style="overflow:hidden;">
+      <div class="tab" id="tab-drop" style="overflow:hidden;display:flex;flex-direction:column;">
+        <!-- Mode switcher -->
+        <div class="drop-mode-bar">
+          <button class="drop-mode-btn active" id="dm-single" onclick="setDropMode('single')">◈ Single Import</button>
+          <button class="drop-mode-btn"        id="dm-batch"  onclick="setDropMode('batch')">⬇ Batch Import</button>
+        </div>
+
+        <!-- Single Import (existing) -->
+        <div id="drop-single" style="display:flex;flex:1;overflow:hidden;">
         <div class="drop-layout">
           <div class="drop-left">
             <!-- Drop zone -->
@@ -548,6 +579,70 @@ nav{padding:14px 0;flex:1;}
             <button class="queue-ingest-all" id="btn-ingest-all" onclick="ingestAll()" style="display:none;">✓ Ingest all as drafts →</button>
           </div>
         </div>
+        </div><!-- /drop-single -->
+
+        <!-- Batch Import panel -->
+        <div id="drop-batch" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+          <div style="display:flex;flex:1;overflow:hidden;">
+            <!-- Left: drop + review -->
+            <div style="flex:1;overflow-y:auto;padding:24px 28px;border-right:1px solid var(--border);">
+              <div class="batch-drop-zone" id="batch-drop-zone"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="handleBatchDrop(event)">
+                <input type="file" multiple accept=".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,.pptx"
+                  onchange="handleBatchSelect(event)"/>
+                <div style="font-size:36px;margin-bottom:12px">⬇</div>
+                <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Drop multiple files here</div>
+                <div style="font-size:11px;color:var(--muted);margin-bottom:14px">All files scanned by AI — you decide what gets ingested</div>
+                <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                  <span class="pill">PDF</span><span class="pill">DOCX</span><span class="pill">PNG/JPG</span><span class="pill">TXT/MD</span><span class="pill">PPTX</span>
+                </div>
+              </div>
+
+              <!-- Scan progress -->
+              <div id="batch-scan-progress" style="display:none">
+                <div style="font-size:10px;letter-spacing:2px;font-family:var(--mono);color:var(--accent-txt);text-transform:uppercase;margin-bottom:8px">
+                  ⏳ Scanning <span id="batch-scan-current">0</span> / <span id="batch-scan-total">0</span> files…
+                </div>
+                <div class="batch-progress"><div class="batch-progress-bar" id="batch-progress-bar" style="width:0%"></div></div>
+              </div>
+
+              <!-- Review grid -->
+              <div id="batch-review-area" style="display:none">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                  <div style="font-size:8px;letter-spacing:3px;font-family:var(--mono);color:var(--faint);text-transform:uppercase">
+                    Review — <span id="batch-selected-count">0</span> selected
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <button onclick="batchSelectAll(true)"  style="font-size:9px;padding:3px 8px;background:var(--sage-dim);border:1px solid var(--sage);border-radius:4px;color:var(--sage-txt);cursor:pointer;font-family:var(--mono)">✓ Select relevant</button>
+                    <button onclick="batchSelectAll(false)" style="font-size:9px;padding:3px 8px;background:var(--bg-code);border:1px solid var(--border);border-radius:4px;color:var(--faint);cursor:pointer;font-family:var(--mono)">Deselect all</button>
+                  </div>
+                </div>
+                <div class="batch-review-grid" id="batch-review-grid"></div>
+                <div class="batch-controls">
+                  <button id="btn-batch-ingest" onclick="ingestBatch()"
+                    style="flex:1;padding:10px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:6px;color:var(--accent-txt);font-family:var(--mono);font-size:11px;letter-spacing:1px;cursor:pointer;text-transform:uppercase">
+                    ✓ Ingest selected as drafts →
+                  </button>
+                  <button onclick="clearBatch()"
+                    style="padding:10px 14px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--faint);font-family:var(--mono);font-size:10px;cursor:pointer">
+                    Clear
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: log -->
+            <div style="width:320px;flex-shrink:0;overflow-y:auto;padding:20px 18px;background:var(--bg-e)">
+              <div style="font-size:8px;letter-spacing:3px;font-family:var(--mono);color:var(--faint);text-transform:uppercase;margin-bottom:12px">Batch Log</div>
+              <div id="batch-log" style="font-size:11px;color:var(--muted);font-family:var(--mono);line-height:2">
+                <div style="color:var(--faint)">Drop files to start scanning…</div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /drop-batch -->
+
       </div>
 
     </div>
@@ -1811,8 +1906,323 @@ async function saveKBEdit(id){
   }catch(e){showToast('Save failed: '+e.message,'error');}
 }
 
-// DROP POINT
 // ═══════════════════════════════════════════════════════════════
+// BATCH IMPORT
+// ═══════════════════════════════════════════════════════════════
+
+state.batchFiles    = [];
+state.batchScanning = false;
+
+function setDropMode(mode){
+  document.getElementById('drop-single').style.display = mode==='single'?'flex':'none';
+  document.getElementById('drop-batch').style.display  = mode==='batch' ?'flex':'none';
+  document.getElementById('dm-single').classList.toggle('active', mode==='single');
+  document.getElementById('dm-batch').classList.toggle('active',  mode==='batch');
+}
+
+function handleBatchDrop(e){
+  e.preventDefault();
+  document.getElementById('batch-drop-zone').classList.remove('drag-over');
+  const files=[...e.dataTransfer.files];
+  if(files.length) startBatchScan(files);
+}
+function handleBatchSelect(e){
+  const files=[...e.target.files];
+  if(files.length) startBatchScan(files);
+}
+
+async function extractFileText(file){
+  const ext=file.name.split('.').pop().toLowerCase();
+  try{
+    if(ext==='pdf'){
+      if(typeof pdfjsLib==='undefined'){
+        await new Promise((res,rej)=>{
+          const s=document.createElement('script');
+          s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+          s.onload=res; s.onerror=rej; document.head.appendChild(s);
+        });
+        pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+      const buf=await file.arrayBuffer();
+      const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+      let text='';
+      const maxP=Math.min(pdf.numPages,5);
+      for(let p=1;p<=maxP;p++){
+        const page=await pdf.getPage(p);
+        const tc=await page.getTextContent();
+        text+=tc.items.filter(i=>typeof i.str==='string').map(i=>i.str).join(' ')+' ';
+        if(text.length>3000) break;
+      }
+      return {text:text.trim().slice(0,3000), type:'pdf', pages:pdf.numPages};
+    }
+    if(['docx','doc'].includes(ext)){
+      if(typeof mammoth==='undefined'){
+        await new Promise((res,rej)=>{
+          const s=document.createElement('script');
+          s.src='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+          s.onload=res; s.onerror=rej; document.head.appendChild(s);
+        });
+      }
+      const buf=await file.arrayBuffer();
+      const result=await mammoth.extractRawText({arrayBuffer:buf});
+      return {text:result.value.trim().slice(0,3000), type:'docx'};
+    }
+    if(['txt','md'].includes(ext)){
+      const text=await file.text();
+      return {text:text.slice(0,3000), type:'text'};
+    }
+    if(['png','jpg','jpeg'].includes(ext)){
+      const base64=await new Promise(res=>{
+        const r=new FileReader();
+        r.onload=e=>res(e.target.result.split(',')[1]);
+        r.readAsDataURL(file);
+      });
+      return {text:'', type:'image', base64, mime:file.type||'image/png'};
+    }
+  }catch(e){ console.warn('Extract failed',file.name,e); }
+  return {text:'', type:'unknown'};
+}
+
+async function prescreenFile(file, extracted){
+  const ext=file.name.split('.').pop().toLowerCase();
+  const isImage=['png','jpg','jpeg'].includes(ext);
+  const sys=`You are an editorial intelligence classifier for a Benelux M&A advisory firm (V4G — Ventures4Growth).
+Evaluate if this file is worth ingesting into the Grapevine Knowledge Base for Benelux lower mid-market M&A professionals (founders, PE, family offices, advisors, EV 5-50M EUR).
+
+Return ONLY valid JSON — no markdown, no explanation:
+{"verdict":"ingest|review|skip","title":"<suggested card title max 12 words>","domain":"01 Sector Deep Dives|02 Strategic Narratives|03 M&A Playbooks|04 Valuation Capital Markets|05 PE Investor Models|06 ETA Entrepreneurial Buyouts|07 Buyer Psychology Deal Dynamics|08 Trends Benchmarking Reports|09 Editorial Signal Intelligence","tier":"A|B|C","source_type":"BOOK_OR_ARTICLE_EXTRACT|RESEARCH_REPORT|OWN_WHITEPAPER|INTERNAL_MEMO","reason":"<one sentence why>"}
+
+Verdict guide: ingest=directly useful for Benelux deal work | review=potentially useful but unclear | skip=personal/unrelated/admin/pure graphic without M&A context`;
+
+  let messages;
+  if(isImage && extracted.base64){
+    messages=[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:extracted.mime,data:extracted.base64}},
+      {type:'text',text:'Filename: '+file.name+'\nSize: '+(file.size/1024).toFixed(0)+'KB\n\nClassify this image for the Grapevine Knowledge Base.'}
+    ]}];
+  } else {
+    messages=[{role:'user',content:'Filename: '+file.name+'\nType: '+ext.toUpperCase()+'\nSize: '+(file.size/1024).toFixed(0)+'KB\n\nContent excerpt:\n'+(extracted.text||'(no text extracted)')}];
+  }
+
+  try{
+    const payload=isImage && extracted.base64
+      ? {filename:file.name, base64:extracted.base64, mime:extracted.mime}
+      : {filename:file.name, text:extracted.text||''};
+    const r=await fetch(EDGE_FN_URL+'/prescreen',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+KEY,'apikey':KEY},
+      body:JSON.stringify(payload)
+    });
+    if(!r.ok) throw new Error('Edge '+r.status);
+    return await r.json();
+  }catch(e){
+    console.warn('Prescreen failed:',file.name,e);
+    return {verdict:'review',title:file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' '),
+      domain:'03 M&A Playbooks',tier:'B',source_type:'BOOK_OR_ARTICLE_EXTRACT',
+      benelux_fit:'analogous',reason:'Scan failed — manual review needed'};
+  }
+}
+
+async function startBatchScan(files){
+  if(state.batchScanning){showToast('Scan already running','warn');return;}
+  state.batchScanning=true;
+  state.batchFiles=[];
+  const total=files.length;
+  document.getElementById('batch-scan-progress').style.display='block';
+  document.getElementById('batch-review-area').style.display='none';
+  document.getElementById('batch-scan-total').textContent=total;
+  document.getElementById('batch-log').innerHTML='';
+  batchLog('Starting scan of '+total+' file'+(total!==1?'s':'')+'...');
+
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    document.getElementById('batch-scan-current').textContent=i+1;
+    document.getElementById('batch-progress-bar').style.width=Math.round((i/total)*100)+'%';
+    batchLog('['+( i+1)+'/'+total+'] Scanning '+file.name+'...');
+    const extracted=await extractFileText(file);
+    const result=await prescreenFile(file,extracted);
+    state.batchFiles.push({
+      file,extracted,
+      verdict:  result.verdict||'review',
+      title:    result.title||file.name.replace(/\.[^.]+$/,''),
+      domain:   result.domain||'03 M&A Playbooks',
+      tier:     result.tier||'B',
+      source_type:result.source_type||'BOOK_OR_ARTICLE_EXTRACT',
+      reason:   result.reason||'',
+      selected: result.verdict==='ingest',
+    });
+    const icon=result.verdict==='ingest'?'[INGEST]':result.verdict==='review'?'[REVIEW]':'[SKIP]';
+    batchLog(icon+' '+file.name);
+  }
+  document.getElementById('batch-progress-bar').style.width='100%';
+  document.getElementById('batch-scan-progress').style.display='none';
+  const ni=state.batchFiles.filter(f=>f.verdict==='ingest').length;
+  const nr=state.batchFiles.filter(f=>f.verdict==='review').length;
+  const ns=state.batchFiles.filter(f=>f.verdict==='skip').length;
+  batchLog('--- Scan complete: '+ni+' ingest, '+nr+' review, '+ns+' skip');
+  state.batchScanning=false;
+  renderBatchReview();
+}
+
+function batchLog(msg){
+  const el=document.getElementById('batch-log');
+  if(!el) return;
+  const line=document.createElement('div');
+  line.style.cssText='padding:1px 0;color:var(--muted)';
+  line.textContent=msg;
+  el.appendChild(line);
+  el.scrollTop=el.scrollHeight;
+}
+
+function renderBatchReview(){
+  const grid=document.getElementById('batch-review-grid');
+  const area=document.getElementById('batch-review-area');
+  if(!grid||!area) return;
+  area.style.display='block';
+  const order={ingest:0,review:1,skip:2};
+  const sorted=[...state.batchFiles].sort((a,b)=>order[a.verdict]-order[b.verdict]);
+  grid.innerHTML=sorted.map((item)=>{
+    const realIdx=state.batchFiles.indexOf(item);
+    const ext=item.file.name.split('.').pop().toLowerCase().toUpperCase();
+    const size=(item.file.size/1024).toFixed(0)+'KB';
+    return '<div class="batch-file-row verdict-'+item.verdict+'" id="brow-'+realIdx+'">'+
+      '<div style="padding-top:2px">'+
+        '<input type="checkbox" '+(item.selected?'checked':'')+
+          ' style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent)"'+
+          ' onchange="toggleBatchItem('+realIdx+',this.checked)"/>'+
+      '</div>'+
+      '<div>'+
+        '<div style="display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap">'+
+          '<span class="batch-verdict verdict-'+item.verdict+'">'+item.verdict.toUpperCase()+'</span>'+
+          '<span style="font-size:9px;background:var(--bg-code);color:var(--faint);padding:1px 5px;border-radius:3px;font-family:var(--mono)">'+ext+'</span>'+
+          '<span style="font-size:9px;color:var(--faint);font-family:var(--mono)">'+size+'</span>'+
+          '<span style="font-size:9px;background:var(--accent-dim);color:var(--accent-txt);padding:1px 5px;border-radius:3px;font-family:var(--mono)">Tier '+item.tier+'</span>'+
+        '</div>'+
+        '<div class="batch-file-title">'+item.title+'</div>'+
+        '<div class="batch-file-meta">'+item.domain+'</div>'+
+        '<div class="batch-file-reason">'+item.reason+'</div>'+
+        '<input type="text" value="'+item.title.replace(/"/g,'&quot;')+'"'+
+          ' style="margin-top:6px;width:100%;background:var(--bg-code);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:11px;color:var(--txt);font-family:var(--mono)"'+
+          ' placeholder="Edit title..."'+
+          ' onchange="state.batchFiles['+realIdx+'].title=this.value"/>'+
+      '</div>'+
+      '<div style="display:flex;flex-direction:column;gap:4px;padding-top:2px">'+
+        '<button onclick="batchVerdictOverride('+realIdx+',\'ingest\')" title="Force ingest"'+
+          ' style="font-size:10px;padding:2px 6px;border-radius:3px;cursor:pointer;border:1px solid var(--sage);background:var(--sage-dim);color:var(--sage-txt)">+</button>'+
+        '<button onclick="batchVerdictOverride('+realIdx+',\'skip\')" title="Force skip"'+
+          ' style="font-size:10px;padding:2px 6px;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:var(--bg-code);color:var(--faint)">-</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  updateBatchSelectedCount();
+}
+
+function toggleBatchItem(idx,checked){
+  state.batchFiles[idx].selected=checked;
+  updateBatchSelectedCount();
+}
+function batchVerdictOverride(idx,verdict){
+  state.batchFiles[idx].verdict=verdict;
+  state.batchFiles[idx].selected=verdict==='ingest';
+  renderBatchReview();
+}
+function batchSelectAll(onlyRelevant){
+  state.batchFiles.forEach(f=>{ f.selected=onlyRelevant ? f.verdict==='ingest' : false; });
+  renderBatchReview();
+}
+function updateBatchSelectedCount(){
+  const n=state.batchFiles.filter(f=>f.selected).length;
+  const el=document.getElementById('batch-selected-count');
+  if(el) el.textContent=n;
+}
+function clearBatch(){
+  state.batchFiles=[];
+  document.getElementById('batch-review-area').style.display='none';
+  document.getElementById('batch-log').innerHTML='<div style="color:var(--faint)">Drop files to start scanning...</div>';
+  const inp=document.getElementById('batch-drop-zone')?.querySelector('input');
+  if(inp) inp.value='';
+}
+
+async function ingestBatch(){
+  const toIngest=state.batchFiles.filter(f=>f.selected);
+  if(!toIngest.length){showToast('No files selected','warn');return;}
+  const btn=document.getElementById('btn-batch-ingest');
+  btn.disabled=true;
+  let ok=0, err=0;
+  for(let i=0;i<toIngest.length;i++){
+    const item=toIngest[i];
+    btn.textContent='Ingesting '+(i+1)+'/'+toIngest.length+'...';
+    batchLog('['+(i+1)+'/'+toIngest.length+'] Ingesting "'+item.title+'"...');
+    try{
+      let aiCard={};
+      const bodyText=item.extracted?.text||'';
+      try{
+        const enR=await fetch(EDGE_FN_URL+'/enrich',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+KEY,'apikey':KEY},
+          body:JSON.stringify({title:item.title, text:bodyText})
+        });
+        if(enR.ok){
+          const enData=await enR.json();
+          if(enData.core_insight) aiCard=enData;
+        }
+      }catch(e){console.warn('Batch enrich failed:',e);}
+      const note={
+        note_type:'KNOWLEDGE_CARD', status:'draft', review_status:'pending',
+        capture_origin:'drop_point', source_type:item.source_type,
+        evidence_type:'DOCUMENT', sensitivity_level:'PUBLIC', visibility_scope:'TEAM',
+        intended_audience:'internal', time_sensitivity:'STRUCTURAL', confidence:'medium',
+        title:aiCard.title||item.title,
+        body:bodyText||aiCard.core_insight||'',
+        body_md:bodyText||null,
+        summary_short:aiCard.core_insight?.slice(0,300)||null,
+        language_code:'en', is_ai_derived:!!aiCard.core_insight, is_deleted:false, link_status:'unlinked', created_by:'analyst',
+        structured_data:{
+          core_insight:aiCard.core_insight||null, deal_implication:aiCard.deal_implication||null,
+          misread_risk:aiCard.misread_risk||null, best_use:aiCard.best_use||null,
+          card_type:'library_source', kb_quality:{tier:item.tier||null,benelux_fit:null},
+          batch_domain:item.domain||null,
+        },
+      };
+      const created=await sbPost('grapevine_notes',note);
+      const newNoteId=created?.[0]?.note_id||null;
+      if(newNoteId && item.file){
+        try{
+          const f=item.file;
+          const ext2=f.name.split('.').pop().toLowerCase();
+          if(['pdf','docx','doc'].includes(ext2)){
+            const folder='library';
+            const path=folder+'/'+newNoteId.slice(0,8)+'_'+f.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+            const SUPA_BASE=URL_BASE.replace('/rest/v1','');
+            const r=await fetch(SUPA_BASE+'/storage/v1/object/grapevine-docs/'+path,{
+              method:'POST',
+              headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':f.type||'application/octet-stream','x-upsert':'true'},
+              body:f,
+            });
+            if(r.ok){
+              const sd=note.structured_data||{};
+              await sbPatch('grapevine_notes',{'note_id':'eq.'+newNoteId},{
+                structured_data:{...sd,storage_url:path,source_access:{storage_url:path,access_type:'both'}}
+              });
+            }
+          }
+        }catch(ue){console.warn('Upload failed:',ue);}
+      }
+      ok++;
+      batchLog('  + "'+(aiCard.title||item.title)+'" ingested');
+    }catch(e){
+      err++;
+      batchLog('  ! Error: '+(e.message||'').slice(0,60));
+    }
+  }
+  btn.disabled=false;
+  btn.textContent='+ Ingest selected as drafts';
+  showToast(ok+' card'+(ok!==1?'s':'')+' ingested'+(err?' ('+err+' errors)':'')+'  — check Curate Drafts');
+  await loadAll();
+  batchLog('--- Done: '+ok+' ingested, '+err+' errors');
+}
+
+// ─────────────────────────────────────────────────────────────
 const ST_TO_NOTE={'PUBLIC_NEWS':'WHISPER_NOTE','REGULATORY_RECORD':'WHISPER_NOTE','LEGAL_PROCEEDING':'WHISPER_NOTE','STRUCTURED_DB_FEED':'WHISPER_NOTE','MARKETPLACE_LISTING':'WHISPER_NOTE','COMPANY_DISCLOSURE':'WHISPER_NOTE','ADVISOR_ANNOUNCEMENT':'WHISPER_NOTE','RESEARCH_REPORT':'KNOWLEDGE_CARD','BOOK_OR_ARTICLE_EXTRACT':'KNOWLEDGE_CARD','OWN_WHITEPAPER':'KNOWLEDGE_CARD','PODCAST_OR_MEDIA_TRANSCRIPT':'KNOWLEDGE_CARD','VALUATION_DATA':'KNOWLEDGE_CARD','CONFERENCE_OR_EVENT_NOTE':'WHISPER_NOTE','HUMAN_WHISPER':'WHISPER_NOTE','INTERNAL_MEMO':'KNOWLEDGE_CARD','OTHER_INTEL':'WHISPER_NOTE'};
 
 function setNoteType(nt){
@@ -2022,26 +2432,14 @@ async function ingestAll(){
       let aiCard={};
       if(q.note_type==='KNOWLEDGE_CARD' && (q.file_text||q.text)){
         try{
-          const aiResp=await fetch('https://api.anthropic.com/v1/messages',{
+          const aiResp=await fetch(EDGE_FN_URL+'/enrich',{
             method:'POST',
-            headers:{'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01'},
-            body:JSON.stringify({
-              model:'claude-haiku-4-5-20251001',
-              max_tokens:1000,
-              system:`You are a senior editorial intelligence editor at a Benelux M&A platform. Extract a reusable KNOWLEDGE_CARD from this document excerpt. Audience: deal professionals, founders, PE partners. Return ONLY valid JSON — no markdown, no preamble:
-{"title":"<sharp title max 12 words>","core_insight":"<2-3 sentences: structural pattern + why recurring>","deal_implication":"<2-3 sentences: actionable for deal professional>","misread_risk":"<1-2 sentences: dangerous misinterpretation>","best_use":["<use case 1>","<use case 2>","<use case 3>"]}`,
-              messages:[{role:'user',content:`Title: ${q.title}
-File: ${q.file_name||'document'}
-
-Content excerpt:
-${(q.file_text||q.text).slice(0,8000)}`}]
-            })
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+KEY,'apikey':KEY},
+            body:JSON.stringify({title:q.title, text:(q.file_text||q.text||'').slice(0,8000)})
           });
           if(aiResp.ok){
             const aiData=await aiResp.json();
-            const raw=(aiData.content||[]).find(b=>b.type==='text')?.text||'';
-            const parsed=JSON.parse(raw.replace(/^```json|```$/g,'').trim());
-            if(parsed.core_insight) aiCard=parsed;
+            if(aiData.core_insight) aiCard=aiData;
           }
         }catch(e){console.warn('AI enrichment failed:',e);}
       }
