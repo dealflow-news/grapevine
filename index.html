@@ -421,9 +421,9 @@ nav{padding:14px 0;flex:1;}
           <div class="curate-sig-pills">
             <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;margin-right:3px">Signal</span>
             <button class="curate-sig-pill active" id="csig-all"    onclick="setCurateSignal('all')">All</button>
-            <button class="curate-sig-pill HIGH"   id="csig-HIGH"   onclick="setCurateSignal('HIGH')">● High</button>
-            <button class="curate-sig-pill MEDIUM" id="csig-MEDIUM" onclick="setCurateSignal('MEDIUM')">● Medium</button>
-            <button class="curate-sig-pill LOW"    id="csig-LOW"    onclick="setCurateSignal('LOW')">○ Low</button>
+            <button class="curate-sig-pill HIGH"   id="csig-HIGH"   onclick="setCurateSignal('HIGH')">🔴 High</button>
+            <button class="curate-sig-pill MEDIUM" id="csig-MEDIUM" onclick="setCurateSignal('MEDIUM')">🟡 Medium</button>
+            <button class="curate-sig-pill LOW"    id="csig-LOW"    onclick="setCurateSignal('LOW')">⚪ Low</button>
           </div>
           <div style="width:1px;height:14px;background:var(--border);margin:0 2px"></div>
           <div class="curate-sig-pills">
@@ -1065,10 +1065,12 @@ function clearCurateSubFilters(){
 function matchCurateSignal(n){
   if(state.curateSignal==='all') return true;
   const sd=n.structured_data||{};
-  const sig=(sd.newsworthiness_score||0);
-  if(state.curateSignal==='HIGH')   return sig>=70;
-  if(state.curateSignal==='MEDIUM') return sig>=40 && sig<70;
-  if(state.curateSignal==='LOW')    return sig<40;
+  const score=(sd.newsworthiness_score||0);
+  const conf=(n.confidence||'').toLowerCase();
+  // Map confidence string to signal bucket
+  if(state.curateSignal==='HIGH')   return score>=70 || conf==='high';
+  if(state.curateSignal==='MEDIUM') return (score>=40 && score<70) || conf==='medium';
+  if(state.curateSignal==='LOW')    return (score>0 && score<40) || conf==='low';
   return true;
 }
 function matchCurateRecency(n){
