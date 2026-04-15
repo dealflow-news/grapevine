@@ -63,7 +63,7 @@ Score each Market Whisper note on NEWSWORTHINESS for a Benelux mid-market M&A au
 
 Scoring criteria (weight):
 1. Deal specificity (25%): Named parties > sector trends > pure opinion
-2. Benelux relevance (25%): BE/LU > NL > FR > other
+2. Regional relevance (25%): BE/NL/LU/FR(Nord) = DIRECT (top score) > other EU > global
 3. Mid-market fit (20%): EV €5M–€500M range signals > mega deals > micro deals
 4. Recency signal (15%): Concrete recent deal > historical reference > timeless trend
 5. Source quality (15%): Named publication/press release > Google News aggregate

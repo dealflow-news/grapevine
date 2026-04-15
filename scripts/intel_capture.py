@@ -283,7 +283,7 @@ def parse_whisper_output(raw_text):
 # ── KnowledgeCardExtractor ─────────────────────────────────────────────────
 
 KNOWLEDGE_CARD_SYSTEM = """You are a senior editorial intelligence editor at a Benelux M&A and dealflow intelligence platform.
-Your task: distil a WHISPER_NOTE flagged as a pattern candidate into a KNOWLEDGE_CARD — a durable, reusable knowledge asset for Benelux deal professionals.
+Your task: distil a WHISPER_NOTE flagged as a pattern candidate into a KNOWLEDGE_CARD — a durable, reusable knowledge asset for deal professionals in Benelux + Northern France (BE/NL/LU + Hauts-de-France/Grand Est).
 
 Audience (always apply):
 - Founders aged 55+ considering succession or exit, family offices, PE partners, notaries, boutique M&A lawyers, corporate development professionals
@@ -305,13 +305,18 @@ Operating rules:
 - English only, no jargon padding, no hedge words ("may", "could potentially")
 - Keep core_insight under 180 words
 
+- regional_applicability: list of markets where this pattern directly applies — use only: BE, NL, LU, FR
+- signal_maturity: how developed is this pattern — emerging | consolidating | mainstream | structural
+
 Return ONLY valid JSON, no markdown fences:
 {
   "title": "<Pattern name — sharp, memorable, max 12 words>",
   "core_insight": "<2–3 sentences>",
   "deal_implication": "<2–3 sentences>",
   "misread_risk": "<1–2 sentences>",
-  "best_use": ["<use case 1>", "<use case 2>", "<use case 3>"]
+  "best_use": ["<use case 1>", "<use case 2>", "<use case 3>"],
+  "regional_applicability": ["BE", "NL"],
+  "signal_maturity": "emerging | consolidating | mainstream | structural"
 }"""
 
 
@@ -373,6 +378,9 @@ body excerpt:
     for key in ('title', 'core_insight', 'deal_implication', 'misread_risk', 'best_use'):
         if key not in parsed:
             raise ValueError(f"KnowledgeCardExtractor: missing key '{key}' in response")
+    # Optional fields — default if missing
+    parsed.setdefault('regional_applicability', ['BE', 'NL', 'LU'])
+    parsed.setdefault('signal_maturity', 'structural')
     return parsed
 
 def fetch_intel_items():
@@ -660,7 +668,7 @@ Score each Market Whisper note on NEWSWORTHINESS for a Benelux mid-market M&A au
 
 Scoring criteria (weight):
 1. Deal specificity (25%): Named parties > sector trends > pure opinion
-2. Benelux relevance (25%): BE/LU > NL > FR > other
+2. Regional relevance (25%): BE/NL/LU/FR(Nord) = DIRECT (top score) > other EU > global
 3. Mid-market fit (20%): EV €5M-€500M signals > mega deals > micro deals
 4. Recency signal (15%): Concrete recent deal > historical reference > timeless trend
 5. Source quality (15%): Named publication/press release > Google News aggregate

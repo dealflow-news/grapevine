@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23141a12'/><circle cx='50' cy='44' r='18' fill='none' stroke='%234a9b6f' stroke-width='7'/><line x1='50' y1='62' x2='50' y2='78' stroke='%234a9b6f' stroke-width='6' stroke-linecap='round'/><line x1='36' y1='72' x2='64' y2='72' stroke='%234a9b6f' stroke-width='5' stroke-linecap='round'/><circle cx='50' cy='44' r='7' fill='%234a9b6f'/></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230f1a0d'/><circle cx='256' cy='220' r='88' fill='none' stroke='%2356b87a' stroke-width='36'/><circle cx='256' cy='220' r='34' fill='%2356b87a'/><line x1='256' y1='308' x2='256' y2='390' stroke='%2356b87a' stroke-width='32' stroke-linecap='round'/><line x1='190' y1='370' x2='322' y2='370' stroke='%2356b87a' stroke-width='28' stroke-linecap='round'/><circle cx='340' cy='148' r='18' fill='%2356b87a' opacity='.6'/><circle cx='300' cy='118' r='12' fill='%2356b87a' opacity='.4'/></svg>">
+  <meta name="apple-mobile-web-app-title" content="Grapevine">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0f1a0d">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grapevine — Intelligence OS</title>
 <style>
@@ -488,7 +491,7 @@ nav{padding:14px 0;flex:1;}
           <div style="width:1px;height:14px;background:var(--border);margin:0 4px"></div>
           <span style="font-size:9px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-right:2px">Regional fit</span>
           <button id="kbf-all"       class="kb-view-btn active" onclick="setKBFit('all')"        style="font-size:9px;padding:3px 8px">All</button>
-          <button id="kbf-direct"    class="kb-view-btn"        onclick="setKBFit('direct')"     style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">🎯 Benelux/FR</button>
+          <button id="kbf-direct"    class="kb-view-btn"        onclick="setKBFit('direct')"     style="font-size:9px;padding:3px 8px;color:var(--sage-txt)">🎯 Benelux+FR(N)</button>
           <button id="kbf-analogous" class="kb-view-btn"        onclick="setKBFit('analogous')"  style="font-size:9px;padding:3px 8px">EU applicable</button>
           <button id="kbf-background"class="kb-view-btn"        onclick="setKBFit('background')" style="font-size:9px;padding:3px 8px;color:var(--faint)">Background</button>
           <div style="width:1px;height:14px;background:var(--border);margin:0 4px"></div>
@@ -644,8 +647,14 @@ nav{padding:14px 0;flex:1;}
                 <span class="dp-label">Geography</span>
                 <select class="dp-select" id="dp-country">
                   <option value="">— select —</option>
-                  <option>BE</option><option>NL</option><option>LU</option><option>FR</option>
-                  <option>BE/NL</option><option>NL/BE</option><option>BE/NL/FR</option><option>Benelux</option>
+                  <optgroup label="── Single">
+                  <option>BE</option><option>NL</option><option>LU</option>
+                  <option>FR (Nord)</option><option>FR (Grand Est)</option>
+                  </optgroup>
+                  <optgroup label="── Combined">
+                  <option>BE/NL</option><option>BE/NL/LU</option><option>BE/NL/FR</option>
+                  <option>Benelux</option><option>Benelux + FR(N)</option>
+                  </optgroup>
                 </select>
               </div>
             </div>
@@ -1223,7 +1232,13 @@ function showCurateDetail(n){
   if(sd.best_use&&sd.best_use.length) html+=`<div class="section">${sl('Best Use')}<div class="pill-row">${sd.best_use.map(u=>pill(u)).join('')}</div></div>`;
 
   // Source box
-  if(sd.source_box) html+=`<div class="section">${sl('Source Box')}<div style="background:var(--bg-code);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--muted);font-family:var(--mono);white-space:pre-wrap">${sd.source_box.slice(0,400)}</div></div>`;
+  if(sd.source_box){
+    const linkified=sd.source_box.slice(0,600).replace(
+      /(https?:\/\/[^\s)\]]+)/g,
+      '<a href="$1" target="_blank" rel="noopener" style="color:var(--accent-txt);text-decoration:underline;word-break:break-all">$1</a>'
+    );
+    html+=`<div class="section">${sl('Source Box')}<div style="background:var(--bg-code);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--muted);font-family:var(--mono);white-space:pre-wrap;line-height:1.7">${linkified}</div></div>`;
+  }
 
   // Document link (storage_url)
   if(sd.storage_url){
@@ -1941,7 +1956,7 @@ function tierBadge(tier){
 }
 function fitLabel(fit){
   if(!fit)return'';
-  const map={direct:'🎯 Benelux/FR direct',analogous:'EU applicable',background:'Background'};
+  const map={direct:'🎯 Benelux + N.France',analogous:'EU applicable',background:'Background'};
   const col={direct:'var(--sage-txt)',analogous:'var(--muted)',background:'var(--faint)'};
   return `<span class="badge" style="color:${col[fit]||'var(--faint)'};background:var(--bg-r);border:1px solid var(--border)">${map[fit]||fit}</span>`;
 }
@@ -2089,7 +2104,7 @@ function selectKB(id){
     <div style="background:var(--bg-code);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:11px;font-family:var(--mono);line-height:2">
       ${sa.author?`<div><span style="color:var(--faint);display:inline-block;width:60px">Author</span><span style="color:var(--txt)">${sa.author}</span></div>`:''}
       ${sa.isbn?`<div><span style="color:var(--faint);display:inline-block;width:60px">ISBN</span><span style="color:var(--muted)">${sa.isbn}</span></div>`:''}
-      ${sd.source_box?`<div style="margin-top:4px;color:var(--muted);font-size:10px;line-height:1.6">${sd.source_box.slice(0,250)}</div>`:''}
+      ${sd.source_box?`<div style="margin-top:4px;color:var(--muted);font-size:10px;line-height:1.6">${sd.source_box.slice(0,300).replace(/(https?:\/\/[^\s)\]]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent-txt);text-decoration:underline;word-break:break-all">$1</a>')}</div>`:''}
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
         ${sa.canonical_url?`<a href="${sa.canonical_url}" target="_blank" rel="noopener" style="color:var(--accent);font-size:10px;text-decoration:none;border:1px solid var(--accent-dim);border-radius:3px;padding:2px 8px">🔗 Open source ↗</a>`:''}
         ${(sd.storage_url||sa.storage_url)?`<a href="#" onclick="openStorageDoc('${sd.storage_url||sa.storage_url}');return false;" style="color:var(--accent);font-size:10px;text-decoration:none;border:1px solid var(--accent-dim);border-radius:3px;padding:2px 8px">📄 Open document</a>`:''}
@@ -2159,10 +2174,10 @@ function openKBEditMode(id){
           </select>
         </div>
         <div class="edit-field">
-          <label class="edit-label">Regional Fit — BE/NL/LU/FR</label>
+          <label class="edit-label">Regional Fit — BE · NL · LU · FR(N)</label>
           <select class="edit-select" id="kbef-fit">
             <option value=""           ${!kbq.benelux_fit?'selected':''}>— select —</option>
-            <option value="direct"     ${kbq.benelux_fit==='direct'    ?'selected':''}>🎯 Benelux/FR direct</option>
+            <option value="direct"     ${kbq.benelux_fit==='direct'    ?'selected':''}>🎯 Benelux + N.France (direct)</option>
             <option value="analogous"  ${kbq.benelux_fit==='analogous' ?'selected':''}>EU applicable</option>
             <option value="background" ${kbq.benelux_fit==='background'?'selected':''}>Background context</option>
           </select>
@@ -2362,13 +2377,13 @@ async function extractFileText(file){
 async function prescreenFile(file, extracted){
   const ext=file.name.split('.').pop().toLowerCase();
   const isImage=['png','jpg','jpeg'].includes(ext);
-  const sys=`You are an editorial intelligence classifier for a Benelux M&A advisory firm (V4G — Ventures4Growth).
-Evaluate if this file is worth ingesting into the Grapevine Knowledge Base for Benelux lower mid-market M&A professionals (founders, PE, family offices, advisors, EV 5-50M EUR).
+  const sys=`You are an editorial intelligence classifier for V4G — Ventures4Growth, a Benelux M&A advisory firm.
+Evaluate if this file is worth ingesting into the Grapevine Knowledge Base for lower mid-market M&A professionals in the V4G coverage region: Belgium, Netherlands, Luxembourg, and Northern France (Hauts-de-France, Grand Est). EV focus: €5–50M.
 
 Return ONLY valid JSON — no markdown, no explanation:
 {"verdict":"ingest|review|skip","title":"<suggested card title max 12 words>","domain":"01 Sector Deep Dives|02 Strategic Narratives|03 M&A Playbooks|04 Valuation Capital Markets|05 PE Investor Models|06 ETA Entrepreneurial Buyouts|07 Buyer Psychology Deal Dynamics|08 Trends Benchmarking Reports|09 Editorial Signal Intelligence","tier":"A|B|C","source_type":"BOOK_OR_ARTICLE_EXTRACT|RESEARCH_REPORT|OWN_WHITEPAPER|INTERNAL_MEMO","reason":"<one sentence why>"}
 
-Verdict guide: ingest=directly useful for Benelux deal work | review=potentially useful but unclear | skip=personal/unrelated/admin/pure graphic without M&A context`;
+Verdict guide: ingest=directly useful for BE/NL/LU/FR(N) deal work | review=potentially useful | skip=personal/unrelated/admin`;
 
   let messages;
   if(isImage && extracted.base64){
