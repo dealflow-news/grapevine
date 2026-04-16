@@ -80,10 +80,11 @@ def main():
         if isinstance(sd, str):
             try: sd = json.loads(sd)
             except: sd = {}
-        if sd.get('kb_tags', {}).get('library_domain'):
+        kbt = sd.get('kb_tags', {})
+        if kbt.get('library_domain') and kbt.get('asset_class'):
             already_tagged += 1
         else:
-            to_tag.append(r)
+            to_tag.append(r)  # missing domain or asset_class
 
     print(f"  Total fetched: {len(rows)}")
     print(f"  Already tagged: {already_tagged}")
