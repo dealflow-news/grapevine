@@ -2528,7 +2528,7 @@ function renderWeekThesis(){
   if(!state.weekThesis){
     if(kicker)kicker.textContent='Week thesis';
     text.textContent='No week thesis set — generate one in Briefing Studio or add via Setup';
-    if(full)full.textContent='';
+    if(full)full.innerHTML='';
     return;
   }
   const wt=state.weekThesis;
@@ -2537,7 +2537,18 @@ function renderWeekThesis(){
   if(kicker)kicker.textContent=weekStart?`Wk ${weekStart}`:'Week thesis';
   const shortText=meta.week_thesis_text||wt.label||'—';
   text.textContent=shortText;
-  if(full)full.textContent=shortText;
+
+  // Expanded block — shows full metadata context
+  if(full){
+    const rows=[];
+    if(meta.rationale)          rows.push(`<div><span style="font-size:8px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase">Rationale</span><div style="margin-top:3px;font-size:12px;color:var(--txt2)">${meta.rationale}</div></div>`);
+    if(meta.sources_to_check)   rows.push(`<div><span style="font-size:8px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase">Sources to check</span><div style="margin-top:3px;font-size:12px;color:var(--muted);font-style:italic">${meta.sources_to_check}</div></div>`);
+    if(meta.editorial_angle)    rows.push(`<div><span style="font-size:8px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase">Editorial angle</span><div style="margin-top:3px;font-size:12px;color:var(--accent-txt)">${meta.editorial_angle}</div></div>`);
+    if(meta.red_flags)          rows.push(`<div><span style="font-size:8px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase">⚠ Red flags</span><div style="margin-top:3px;font-size:12px;color:var(--gold)">${meta.red_flags}</div></div>`);
+    full.innerHTML=rows.length
+      ?`<div style="display:flex;flex-direction:column;gap:10px;padding:4px 0">${rows.join('')}</div>`
+      :`<div style="color:var(--faint);font-size:11px;font-family:var(--mono)">No additional context — add rationale, sources, and angle via Setup or AI generation.</div>`;
+  }
 }
 
 // E.2 — KPI Strip
