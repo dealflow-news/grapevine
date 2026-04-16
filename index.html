@@ -295,8 +295,8 @@ nav{padding:14px 0;flex:1;}
 .today-mid{display:flex;flex:1;overflow:hidden;}
 .today-feed{width:clamp(260px,32%,380px);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;}
 .today-detail-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
-.today-bottom{padding:12px 18px;border-top:2px solid var(--border);background:var(--bg-e);flex-shrink:0;display:grid;grid-template-columns:1fr 1fr;gap:12px;max-height:190px;overflow:hidden;}
-.today-card{background:var(--bg-r);border:1px solid var(--border);border-radius:8px;padding:12px;overflow:hidden;}
+.today-bottom{padding:12px 18px;border-top:2px solid var(--border);background:var(--bg-e);flex-shrink:0;display:grid;grid-template-columns:1fr 1fr;gap:12px;max-height:220px;overflow:hidden;}
+.today-card{background:var(--bg-r);border:1px solid var(--border);border-radius:8px;padding:12px;overflow-y:auto;}
 .today-card-hdr{font-size:8px;letter-spacing:3px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;margin-bottom:8px;}
 .today-pattern-item{font-size:12px;color:var(--txt2);padding:4px 0;border-bottom:1px solid var(--border-sub);display:flex;justify-content:space-between;align-items:center;}
 .today-pattern-count{background:var(--accent-dim);color:var(--accent-txt);border-radius:10px;padding:1px 7px;font-size:10px;font-family:var(--mono);}
@@ -417,7 +417,7 @@ nav{padding:14px 0;flex:1;}
         <div class="today-lens-bar">
           <span class="lens-label">Lens</span>
           <div id="today-lens-pills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-          <button class="lens-btn" style="margin-left:auto;opacity:.55" onclick="state.activeLens=null;renderTodayLensBar();renderTodayFeed()">✕ Clear</button>
+          <button class="lens-btn" style="margin-left:auto;" onclick="state.activeLens=null;renderTodayLensBar();renderTodayFeed()">✕ Clear</button>
         </div>
         <!-- Mid zone: signal feed + detail (E.4) -->
         <div class="today-mid">
@@ -517,25 +517,36 @@ nav{padding:14px 0;flex:1;}
 
       <!-- KNOWLEDGE BASE -->
       <div class="tab" id="tab-kb">
-        <!-- Row 1: Search + count + toggles -->
-        <div class="kb-toolbar">
-          <div class="kb-search">
-            <input type="text" id="kb-input" placeholder="Search patterns, sectors, use cases…" oninput="renderKB()"/>
-            <button class="clear" onclick="document.getElementById('kb-input').value='';renderKB()">×</button>
-          </div>
-          <span class="kb-count" id="kb-count">0 cards</span>
-          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;">
+        <!-- Row 1: View tabs + count + toggles + expand -->
+        <div class="status-bar">
+          <button id="kbv-all"      class="status-btn active" onclick="setKBView('all')">All <span id="kbvc-all" class="status-count">0</span></button>
+          <button id="kbv-library"  class="status-btn"        onclick="setKBView('library')">◉ Library <span id="kbvc-library" class="status-count">0</span></button>
+          <button id="kbv-patterns" class="status-btn"        onclick="setKBView('patterns')">◈ Patterns <span id="kbvc-patterns" class="status-count">0</span></button>
+          <button id="kbv-standards"class="status-btn"        onclick="setKBView('standards')">▣ Standards <span id="kbvc-standards" class="status-count">0</span></button>
+          <span class="kb-count" id="kb-count" style="margin-left:auto">0 cards</span>
+          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:12px">
             <input type="checkbox" id="kb-show-drafts" onchange="closeKBDetail();renderKB()"> Show drafts
           </label>
-          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:6px;">
+          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:8px">
             <input type="checkbox" id="kb-show-archived" onchange="renderKB()"> Include archived
           </label>
-          <button id="kb-expand-all-btn" onclick="toggleKBExpandAll()" style="margin-left:auto;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--faint);font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.borderColor='var(--muted)';this.style.color='var(--txt)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--faint)'">⊟ Collapse all</button>
+          <button id="kb-expand-all-btn" onclick="toggleKBExpandAll()" style="margin-left:10px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--faint);font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.borderColor='var(--muted)';this.style.color='var(--txt)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--faint)'">⊟ Collapse all</button>
         </div>
-        <!-- Row 2: Smart filters -->
+        <!-- Row 2: Search -->
+        <div class="kb-toolbar">
+          <div class="kb-search" style="max-width:100%">
+            <input type="text" id="kb-input" placeholder="Search title, author, insight, use case…" oninput="renderKB()"/>
+            <button class="clear" onclick="document.getElementById('kb-input').value='';renderKB()">×</button>
+          </div>
+        </div>
+        <!-- Row 3: Smart filters -->
         <div class="kb-filter-bar">
-          <button class="kb-filter-btn fit-btn" id="kb-fit-direct" onclick="toggleKBFit('direct')">🎯 Benelux+FR(N)</button>
-          <div style="width:1px;background:var(--border);margin:0 2px;align-self:stretch;"></div>
+          <span style="font-size:9px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;flex-shrink:0;">Regional fit</span>
+          <button id="kbf-all"        class="kb-filter-btn active"   onclick="setKBFit('all')">All</button>
+          <button id="kbf-direct"     class="kb-filter-btn fit-btn"  onclick="setKBFit('direct')"    style="color:var(--sage-txt)">🎯 Benelux+FR(N)</button>
+          <button id="kbf-analogous"  class="kb-filter-btn"          onclick="setKBFit('analogous')">EU applicable</button>
+          <button id="kbf-background" class="kb-filter-btn"          onclick="setKBFit('background')" style="opacity:.7">Background</button>
+          <div style="width:1px;background:var(--border);margin:0 4px;align-self:stretch;"></div>
           <div class="kb-dd-wrap">
             <button class="kb-filter-btn" id="kb-dd-btn-lens" onclick="toggleKBDropdown('lens',event)">Lens ▾</button>
             <div class="kb-dd-panel" id="kb-dd-lens"><div class="kb-dd-list" id="kb-dd-lens-list"></div></div>
@@ -550,7 +561,7 @@ nav{padding:14px 0;flex:1;}
           </div>
           <button class="kb-filter-btn" style="margin-left:auto;opacity:.55" onclick="clearKBFilters()">✕ Clear filters</button>
         </div>
-        <!-- Row 3: Active filter pills -->
+        <!-- Row 4: Active filter pills -->
         <div class="kb-pills-bar" id="kb-pills-bar" style="display:none;"></div>
         <div style="display:flex;flex:1;overflow:hidden;">
           <div id="kb-grid-wrap" style="width:420px;min-width:320px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);"><div class="kb-grid" id="kb-grid"></div></div>
@@ -884,6 +895,7 @@ const state = {
   kbTier: null,
   kbFit: null,
   kbCollapsed: new Set(),
+  kbView: 'all',
   curateSignal: 'all',
   curateRecency: 'all',
   selectedKBId: null,
@@ -949,6 +961,23 @@ function stBadge(st){if(!st)return'';const c=ST_COLOR[st]||'var(--muted)';return
 function confBadge(c){const col=CONF[c]||'var(--muted)';const bg=c&&c.toLowerCase()==='high'?'var(--sage-dim)':c&&c.toLowerCase()==='medium'?'var(--gold-dim)':'var(--bg-r)';return badge(`⬤ ${c||'?'}`,col,bg);}
 function truncate(s,n){return s&&s.length>n?s.slice(0,n)+'…':(s||'');}
 function timeAgo(ts){if(!ts)return'';const s=Math.floor((Date.now()-new Date(ts))/1000);if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';if(s<604800)return Math.floor(s/86400)+'d ago';return Math.floor(s/604800)+'w ago';}
+function tierBadge(tier){
+  if(!tier)return'';
+  const map={A:{c:'var(--sage)',b:'var(--sage-dim)'},B:{c:'var(--gold)',b:'var(--gold-dim)'},C:{c:'var(--faint)',b:'var(--bg-code)'}};
+  const {c,b}=map[tier]||{c:'var(--faint)',b:'var(--bg-code)'};
+  return badge(`Tier ${tier}`,c,b);
+}
+function fitLabel(fit){
+  if(!fit||fit==='all')return'';
+  const map={direct:'🎯 Benelux + N.France',analogous:'EU applicable',background:'Background'};
+  const col={direct:'var(--sage-txt)',analogous:'var(--muted)',background:'var(--faint)'};
+  return `<span class="badge" style="color:${col[fit]||'var(--faint)'};background:var(--bg-r);border:1px solid var(--border)">${map[fit]||fit}</span>`;
+}
+function linkifyUrls(text){
+  if(!text)return'';
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(https?:\/\/[^\s<>"')\]]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent-txt);text-decoration:underline;word-break:break-all">$1</a>');
+}
 
 function updateStats(){
   const notes=state.notes;
@@ -985,7 +1014,7 @@ function switchTab(id){
   document.getElementById('header-sub').textContent   = (HEADER_META[id]||{}).sub||'';
   if(id==='kb') renderKB();
   if(id==='today') renderToday();
-  if(id==='studio') renderStudioSources();
+  if(id==='studio'){ renderStudioSources(); updateStudioGenerateBtn(); }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1168,7 +1197,7 @@ function showCurateDetail(n){
   if(sd.best_use&&sd.best_use.length) html+=`<div class="section">${sl('Best Use')}<div class="pill-row">${sd.best_use.map(u=>pill(u)).join('')}</div></div>`;
 
   // Source box
-  if(sd.source_box) html+=`<div class="section">${sl('Source Box')}<div style="background:var(--bg-code);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--muted);font-family:var(--mono);white-space:pre-wrap">${sd.source_box.slice(0,400)}</div></div>`;
+  if(sd.source_box) html+=`<div class="section">${sl('Source Box')}<div style="background:var(--bg-code);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--muted);font-family:var(--mono);white-space:pre-wrap;line-height:1.7">${linkifyUrls(sd.source_box.slice(0,600))}</div></div>`;
 
   // Document link (storage_url)
   if(sd.storage_url){
@@ -1681,10 +1710,23 @@ function closeKBDropdowns(){
   });
 }
 
-function toggleKBFit(val){
-  state.kbFit=state.kbFit===val?null:val;
-  const btn=document.getElementById('kb-fit-direct');
-  if(btn) btn.classList.toggle('fit-active', !!state.kbFit);
+function setKBView(v){
+  state.kbView=v;
+  ['all','library','patterns','standards'].forEach(w=>{
+    const b=document.getElementById(`kbv-${w}`);
+    if(b) b.classList.toggle('active',w===v);
+  });
+  closeKBDetail();
+  renderKB();
+}
+
+function setKBFit(val){
+  state.kbFit=val;
+  ['all','direct','analogous','background'].forEach(v=>{
+    const b=document.getElementById(`kbf-${v}`);
+    if(b) b.classList.toggle('active',v===val);
+    if(b) b.classList.toggle('fit-active',v===val&&val!=='all');
+  });
   updateKBPills(); renderKB();
 }
 
@@ -1732,11 +1774,14 @@ function removeKBSector(code){ toggleKBSector(code); }
 function removeKBType(code){ toggleKBType(code); }
 
 function clearKBFilters(){
-  state.kbFit=null; state.kbTier=null;
+  state.kbFit='all'; state.kbTier=null;
   state.kbLens=[]; state.kbSector=[]; state.kbType=[];
   initKBFilters();
   ['A','B','C'].forEach(t=>{const b=document.getElementById(`kb-tier-${t.toLowerCase()}`);if(b)b.classList.remove('active');});
-  const fd=document.getElementById('kb-fit-direct');if(fd)fd.classList.remove('fit-active');
+  ['all','direct','analogous','background'].forEach(v=>{
+    const b=document.getElementById(`kbf-${v}`);
+    if(b){b.classList.toggle('active',v==='all');b.classList.remove('fit-active');}
+  });
   ['lens','sector','type'].forEach(w=>{const b=document.getElementById(`kb-dd-btn-${w}`);if(b){b.classList.remove('active');b.textContent=w.charAt(0).toUpperCase()+w.slice(1)+' ▾';}});
   updateKBPills(); renderKB();
 }
@@ -1745,7 +1790,10 @@ function updateKBPills(){
   const bar=document.getElementById('kb-pills-bar');
   if(!bar) return;
   let html='';
-  if(state.kbFit) html+=`<span class="kb-active-pill" style="color:var(--sage-txt);background:var(--sage-dim);border:1px solid var(--sage)">🎯 ${state.kbFit}<button onclick="toggleKBFit('${state.kbFit}')">×</button></span>`;
+  if(state.kbFit&&state.kbFit!=='all'){
+    const fitMap={direct:'🎯 Benelux+FR(N)',analogous:'EU applicable',background:'Background'};
+    html+=`<span class="kb-active-pill" style="color:var(--sage-txt);background:var(--sage-dim);border:1px solid var(--sage)">${fitMap[state.kbFit]||state.kbFit}<button onclick="setKBFit('all')">×</button></span>`;
+  }
   if(state.kbTier) html+=`<span class="kb-active-pill" style="color:var(--accent-txt);background:var(--accent-dim);border:1px solid var(--accent)">Tier ${state.kbTier}<button onclick="toggleKBTier('${state.kbTier}')">×</button></span>`;
   state.kbLens.forEach(c=>{const o=KB_LENS_OPTIONS.find(x=>x.id===c);if(o)html+=`<span class="kb-active-pill" style="color:var(--sage-txt);background:var(--sage-dim);border:1px solid var(--sage)">${o.label}<button onclick="removeKBLens('${c}')">×</button></span>`;});
   state.kbSector.forEach(c=>{const o=KB_SECTOR_OPTIONS.find(x=>x.id===c);if(o)html+=`<span class="kb-active-pill" style="color:var(--gold-txt);background:var(--gold-dim);border:1px solid var(--gold)">${o.label}<button onclick="removeKBSector('${c}')">×</button></span>`;});
@@ -1807,14 +1855,23 @@ function renderKB(){
       (sd.core_insight||'').toLowerCase().includes(q)||
       (sd.best_use||[]).some(b=>b.toLowerCase().includes(q))||
       (n.sector_code||'').toLowerCase().includes(q)||
+      ((sd.source_access||{}).author||'').toLowerCase().includes(q)||
       (sd.newsletter_angle||'').toLowerCase().includes(q);
+  };
+
+  const matchView=n=>{
+    const ct=(n.structured_data||{}).card_type||'';
+    if(state.kbView==='library')  return ct==='library_source';
+    if(state.kbView==='patterns') return ct==='pattern';
+    if(state.kbView==='standards')return ct==='standard';
+    return true;
   };
 
   const matchFilters=n=>{
     const sd=n.structured_data||{};
     const tags=sd.kb_tags||{};
     const quality=sd.kb_quality||{};
-    if(state.kbFit&&quality.benelux_fit!==state.kbFit) return false;
+    if(state.kbFit&&state.kbFit!=='all'&&quality.benelux_fit!==state.kbFit) return false;
     if(state.kbTier&&quality.tier!==state.kbTier) return false;
     if(state.kbLens.length&&!state.kbLens.some(l=>(tags.ma_lens||[]).includes(l))) return false;
     if(state.kbSector.length&&!state.kbSector.some(s=>(tags.sector||[]).includes(s))) return false;
@@ -1822,24 +1879,32 @@ function renderKB(){
     return true;
   };
 
-  const allCards=state.notes.filter(n=>
-    n.note_type==='KNOWLEDGE_CARD'&&!n.is_deleted&&matchQ(n)&&matchFilters(n)&&
-    (showDrafts?n.status==='draft':showArchived?n.status!=='draft':n.status==='active'||
-    (showArchived&&n.status==='archived'))
-  );
-  // Simpler: build sets based on toggles
   const statusOk=n=>{
     if(showDrafts) return n.status==='draft';
     if(showArchived) return n.status==='active'||n.status==='archived';
     return n.status==='active';
   };
+
   const cards=state.notes.filter(n=>
-    n.note_type==='KNOWLEDGE_CARD'&&!n.is_deleted&&statusOk(n)&&matchQ(n)&&matchFilters(n)
+    n.note_type==='KNOWLEDGE_CARD'&&!n.is_deleted&&statusOk(n)&&matchQ(n)&&matchView(n)&&matchFilters(n)
   );
 
+  // Stale detail fix: close if selected card no longer in filtered set
+  if(state.selectedKBId&&!cards.find(c=>c.note_id===state.selectedKBId)){
+    closeKBDetail();
+  }
+
+  // View tab counts (always from full active set, ignoring current filters)
+  const allKC=state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='active'&&!n.is_deleted);
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('kbvc-all',      allKC.length);
+  set('kbvc-library',  allKC.filter(n=>(n.structured_data||{}).card_type==='library_source').length);
+  set('kbvc-patterns', allKC.filter(n=>(n.structured_data||{}).card_type==='pattern').length);
+  set('kbvc-standards',allKC.filter(n=>(n.structured_data||{}).card_type==='standard').length);
+
   const total=cards.length;
-  const hasFilters=!!(state.kbFit||state.kbTier||state.kbLens.length||state.kbSector.length||state.kbType.length);
-  document.getElementById('kb-count').textContent=`${total} card${total!==1?'s':''}${hasFilters?' (filtered)':''}`;
+  const hasFilters=!!(state.kbFit&&state.kbFit!=='all')||!!(state.kbTier||state.kbLens.length||state.kbSector.length||state.kbType.length)||state.kbView!=='all';
+  set('kb-count',`${total} card${total!==1?'s':''}${hasFilters?' (filtered)':''}`);
   updateKBExpandBtn();
 
   const renderCard=c=>{
@@ -1907,24 +1972,44 @@ function selectKB(id){
   const c=state.notes.find(x=>x.note_id===id);
   if(!c)return;
   const sd=c.structured_data||{};
+  const kbq=sd.kb_quality||{};
+  const sa=sd.source_access||{};
+  const ct=sd.card_type||'';
+  const ctLabel=ct==='pattern'?'◈ Pattern Card':ct==='standard'?'▣ Standard':'◉ Library Source';
   kd.classList.add('open');
   if(kgrid)kgrid.style.gridTemplateColumns='1fr';
+
+  const sourceBlock=(sa.canonical_url||sd.storage_url||sa.storage_url)?`
+    <div class="section">${sl('Source')}
+      <div style="font-size:11px;color:var(--muted);font-family:var(--mono);line-height:1.7">
+        ${sd.source_box?`<div style="margin-bottom:6px">${linkifyUrls(sd.source_box)}</div>`:''}
+        ${sa.author?`<div style="color:var(--faint)">✍ ${sa.author}</div>`:''}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        ${sa.canonical_url?`<a href="${sa.canonical_url}" target="_blank" rel="noopener" style="color:var(--accent);font-size:10px;text-decoration:none;border:1px solid var(--accent-dim);border-radius:3px;padding:3px 9px;font-family:var(--mono)">🔗 Open source ↗</a>`:''}
+        ${(sd.storage_url||sa.storage_url)?`<a href="#" onclick="openStorageDoc('${sd.storage_url||sa.storage_url}');return false;" style="color:var(--accent);font-size:10px;text-decoration:none;border:1px solid var(--accent-dim);border-radius:3px;padding:3px 9px;font-family:var(--mono)">📄 Open document</a>`:''}
+      </div>
+    </div>`:
+    (sd.source_box?`<div class="section">${sl('Source')}<div style="font-size:11px;color:var(--muted);font-family:var(--mono);line-height:1.7">${linkifyUrls(sd.source_box)}</div></div>`:'');
+
   kd.innerHTML=`
     <div class="kb-detail-body">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div class="section-label">Knowledge Card</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="section-label">${ctLabel}</div>
         <button class="kb-close" onclick="selectKB('${id}')">×</button>
       </div>
-      <div style="font-size:15px;font-weight:700;color:var(--txt);line-height:1.4;margin-bottom:16px">${c.title}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">
+        ${kbq.tier?tierBadge(kbq.tier):''}
+        ${kbq.benelux_fit?fitLabel(kbq.benelux_fit):''}
+        ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
+        ${confBadge(c.confidence)}
+      </div>
+      <div style="font-size:15px;font-weight:700;color:var(--txt);line-height:1.4;margin-bottom:16px">${c.title||'(untitled)'}</div>
       ${sd.core_insight?`<div class="section">${sl('Core Insight')}<div class="insight-block">${sd.core_insight}</div></div>`:''}
       ${sd.deal_implication?`<div class="section">${sl('Deal Implication')}<div style="font-size:12px;color:var(--muted);line-height:1.65">${sd.deal_implication}</div></div>`:''}
       ${sd.misread_risk?`<div class="section">${sl('⚠ Misread Risk','var(--amber)')}<div class="warning-block">${sd.misread_risk}</div></div>`:''}
       ${sd.best_use&&sd.best_use.length?`<div class="section">${sl('Best Use')}<div class="pill-row">${sd.best_use.map(u=>pill(u)).join('')}</div></div>`:''}
-      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:12px">
-        ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
-        ${c.geo_country?badge(c.geo_country,'var(--faint)','var(--bg-code)'):''}
-        ${confBadge(c.confidence)}
-      </div>
+      ${sourceBlock}
     </div>
     <div class="kb-detail-footer"><div class="actions">
       ${c.status==='draft'?`
@@ -2312,6 +2397,12 @@ function renderTodayLensBar(){
 function renderTodayFeed(){
   const el=document.getElementById('today-feed');
   if(!el)return;
+
+  if(!state.notes.length){
+    el.innerHTML='<div class="empty-list" style="padding:32px;color:var(--faint);font-size:12px;font-family:var(--mono);text-align:center">No data loaded — click ↺ Refresh</div>';
+    return;
+  }
+
   const lens=LENS_PRESETS.find(l=>l.id===state.activeLens)||null;
 
   let notes=state.notes.filter(n=>
@@ -2398,15 +2489,17 @@ function renderTodayPatterns(){
   const whispers=state.notes.filter(n=>n.note_type==='WHISPER_NOTE'&&n.status==='active'&&!n.is_deleted);
   const map={};
   whispers.forEach(n=>{
-    const domain=((n.structured_data||{}).kb_tags||{}).library_domain;
-    if(domain){map[domain]=(map[domain]||0)+1;}
+    // Primary: sector_code (always present on whispers) — gives most useful grouping
     const sec=n.sector_code;
     if(sec){const k=`§ ${sec}`;map[k]=(map[k]||0)+1;}
+    // Secondary: library_domain from kb_tags (only on KCs, rarely on whispers — bonus signal)
+    const domain=((n.structured_data||{}).kb_tags||{}).library_domain;
+    if(domain&&domain!=='ld_insights_library'){map[domain]=(map[domain]||0)+1;}
   });
   const items=Object.entries(map).filter(([,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,4);
   if(!items.length){el.innerHTML='<div style="color:var(--faint);font-size:11px;font-family:var(--mono)">No convergence patterns yet — promote more signals to active</div>';return;}
   el.innerHTML=items.map(([key,count])=>{
-    const label=key.startsWith('§')?key:key.replace(/^ld_/,'').replace(/_/g,' ');
+    const label=key.startsWith('§')?key.replace('§ ',''):key.replace(/^ld_/,'').replace(/_/g,' ');
     return `<div class="today-pattern-item">
       <span style="font-size:12px;color:var(--txt2);text-transform:capitalize">${label}</span>
       <span class="today-pattern-count">${count} signals</span>
@@ -2448,10 +2541,16 @@ const STUDIO_THESES=[
 ];
 
 // E.8 — Thesis selector
+function updateStudioGenerateBtn(){
+  const btn=document.getElementById('studio-generate-btn');
+  if(btn) btn.disabled=!state.studioThesis||state.studioSources.size===0;
+}
+
 function setStudioThesis(id){
   state.studioThesis=id;
   document.querySelectorAll('.thesis-btn').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
   clearStudioOutput();
+  updateStudioGenerateBtn();
 }
 
 // E.8 — Format selector
@@ -2466,6 +2565,7 @@ function toggleStudioSource(id){
   else if(state.studioSources.size>=6){showToast('Max 6 sources — deselect one first','warn');return;}
   else{state.studioSources.add(id);}
   renderStudioSources();
+  updateStudioGenerateBtn();
 }
 
 function renderStudioSources(){
@@ -2666,7 +2766,7 @@ function handleUrlParams() {
 // ═══════════════════════════════════════════════════════════════
 renderKB();
 initKBFilters();
-switchTab('today');
+switchTab('today'); // sets header title + active nav correctly
 if(KEY){
   loadAll().then(() => handleUrlParams());
 } else {
