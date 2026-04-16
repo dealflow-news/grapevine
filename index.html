@@ -2339,6 +2339,9 @@ const LENS_PRESETS = [
   { id:'growth',       label:'Growth Signal', keywords:['growth','expansion','scale','organic'] },
   { id:'asset_sale',   label:'Asset Sale',    keywords:['asset_sale','carve','divestiture','disposal'] },
   { id:'founder_exit', label:'Founder Exit',  keywords:['founder','exit','family_business'] },
+  { id:'regulatory',   label:'Regulatory',    keywords:['regulat','compliance','nza','autoriteit','enforcement'] },
+  { id:'cross_border', label:'Cross-Border',  keywords:['cross_border','cross-border','international','foreign','acquisit'] },
+  { id:'roll_up',      label:'Roll-Up',       keywords:['roll_up','roll-up','consolidat','buy_and_build','add-on','add_on'] },
 ];
 
 function isThisWeek(ts){
@@ -2353,10 +2356,24 @@ function isToday(ts){
 }
 function noteMatchesLens(n,lens){
   if(!lens)return true;
-  const lenses=((n.structured_data||{}).kb_tags||{}).ma_lens||[];
-  // Also check sector/geo text for partial match
-  const textPool=[...lenses, n.sector_code||'', n.geo_country||''].map(s=>s.toLowerCase()).join(' ');
-  return lens.keywords.some(k=>textPool.includes(k));
+  const sd=n.structured_data||{};
+  // Structured taxonomy (set on KCs, sometimes on whispers)
+  const maLenses=(sd.kb_tags||{}).ma_lens||[];
+  const strategicThemes=(sd.kb_tags||{}).strategic_themes||[];
+  // Free-text fields (always present on whispers)
+  const textFields=[
+    n.title||'',
+    n.body_md||'',
+    n.summary_short||'',
+    sd.newsletter_angle||'',
+    sd.what_we_know||'',
+    sd.pattern_name||'',
+    n.sector_code||'',
+    n.geo_country||'',
+    ...maLenses,
+    ...strategicThemes,
+  ].join(' ').toLowerCase();
+  return lens.keywords.some(k=>textFields.includes(k));
 }
 
 function setActiveLens(id){
