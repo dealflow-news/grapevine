@@ -249,6 +249,18 @@ nav{padding:14px 0;flex:1;}
 
 /* Toast */
 
+/* ── KB Domain Sections ─────────────────────────────────────── */
+.kb-domain-section{border-bottom:1px solid var(--border-sub);}
+.kb-domain-hdr{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;user-select:none;transition:background .1s;}
+.kb-domain-hdr:hover{background:var(--bg-r);}
+.kb-domain-num{font-size:9px;font-family:var(--mono);color:var(--faint);letter-spacing:1px;flex-shrink:0;width:18px;}
+.kb-domain-label{font-size:12px;font-weight:600;color:var(--txt);flex:1;letter-spacing:-.1px;}
+.kb-domain-count{font-size:10px;font-family:var(--mono);color:var(--faint);flex-shrink:0;}
+.kb-domain-chevron{font-size:11px;color:var(--faint);transition:transform .18s;flex-shrink:0;margin-left:4px;}
+.kb-domain-hdr.collapsed .kb-domain-chevron{transform:rotate(-90deg);}
+.kb-domain-cards{padding:0 8px 8px;}
+.kb-domain-cards.hidden{display:none;}
+
 /* ── KB Filter Rows ─────────────────────────────────────────── */
 .kb-filter-bar{padding:7px 18px;border-bottom:1px solid var(--border);display:flex;gap:6px;background:var(--bg-e);flex-shrink:0;align-items:center;flex-wrap:wrap;}
 .kb-pills-bar{padding:5px 18px;border-bottom:1px solid var(--border);display:flex;gap:5px;background:var(--bg-e);flex-shrink:0;flex-wrap:wrap;align-items:center;}
@@ -505,6 +517,7 @@ nav{padding:14px 0;flex:1;}
           <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:6px;">
             <input type="checkbox" id="kb-show-archived" onchange="renderKB()"> Include archived
           </label>
+          <button id="kb-expand-all-btn" onclick="toggleKBExpandAll()" style="margin-left:auto;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--faint);font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.borderColor='var(--muted)';this.style.color='var(--txt)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--faint)'">⊟ Collapse all</button>
         </div>
         <!-- Row 2: Smart filters -->
         <div class="kb-filter-bar">
@@ -861,6 +874,7 @@ const state = {
   kbType: [],
   kbTier: null,
   kbFit: null,
+  kbCollapsed: new Set(),
   selectedKBId: null,
   promoteTargetId: null,
   promoteAudience: 'internal',
@@ -1681,6 +1695,47 @@ function updateKBPills(){
   bar.innerHTML=html;
 }
 
+const KB_DOMAIN_META = {
+  ld_sector_heatmaps:           { num:'01', label:'Sector Deep Dives & Strategic Heatmaps' },
+  ld_strategic_narratives:      { num:'02', label:'Strategic Narratives & Outlooks' },
+  ld_thought_leadership:        { num:'03', label:'Thought Leadership & Brand Positioning' },
+  ld_playbooks_training:        { num:'04', label:'M&A Playbooks & Deal Training' },
+  ld_editorial_newsfeeds:       { num:'05', label:'Editorial Strategy & News Feeds' },
+  ld_valuation_capital:         { num:'06', label:'Valuation & Capital Intelligence' },
+  ld_investor_models_pe:        { num:'07', label:'Investor Models & PE Insights' },
+  ld_search_ebo:                { num:'08', label:'Search & Entrepreneurial Buyouts' },
+  ld_buyer_investor_psychology: { num:'09', label:'Buyer & Investor Psychology' },
+  ld_trends_benchmarking:       { num:'10', label:'Trends, Reports & Benchmarking' },
+  ld_insights_library:          { num:'11', label:'Insights Library' },
+};
+
+function toggleKBDomain(id){
+  if(state.kbCollapsed.has(id)) state.kbCollapsed.delete(id);
+  else state.kbCollapsed.add(id);
+  // Toggle DOM directly — no full re-render needed
+  const hdr=document.getElementById(`kbdh-${id}`);
+  const cards=document.getElementById(`kbdc-${id}`);
+  if(hdr) hdr.classList.toggle('collapsed', state.kbCollapsed.has(id));
+  if(cards) cards.classList.toggle('hidden', state.kbCollapsed.has(id));
+  updateKBExpandBtn();
+}
+
+function toggleKBExpandAll(){
+  const allCollapsed=state.kbCollapsed.size>0;
+  if(allCollapsed){
+    state.kbCollapsed.clear();
+  } else {
+    Object.keys(KB_DOMAIN_META).forEach(id=>state.kbCollapsed.add(id));
+  }
+  renderKB();
+}
+
+function updateKBExpandBtn(){
+  const btn=document.getElementById('kb-expand-all-btn');
+  if(!btn) return;
+  btn.textContent=state.kbCollapsed.size>0?'⊞ Expand all':'⊟ Collapse all';
+}
+
 function renderKB(){
   const q=(document.getElementById('kb-input').value||'').toLowerCase().trim();
   const showDrafts=document.getElementById('kb-show-drafts').checked;
@@ -1708,18 +1763,29 @@ function renderKB(){
     return true;
   };
 
-  const activeCards  =!showDrafts ?state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='active'  &&!n.is_deleted&&matchQ(n)&&matchFilters(n)):[];
-  const draftCards   = showDrafts  ?state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='draft'   &&!n.is_deleted&&matchQ(n)&&matchFilters(n)):[];
-  const archivedCards= showArchived?state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='archived'&&!n.is_deleted&&matchQ(n)&&matchFilters(n)):[];
+  const allCards=state.notes.filter(n=>
+    n.note_type==='KNOWLEDGE_CARD'&&!n.is_deleted&&matchQ(n)&&matchFilters(n)&&
+    (showDrafts?n.status==='draft':showArchived?n.status!=='draft':n.status==='active'||
+    (showArchived&&n.status==='archived'))
+  );
+  // Simpler: build sets based on toggles
+  const statusOk=n=>{
+    if(showDrafts) return n.status==='draft';
+    if(showArchived) return n.status==='active'||n.status==='archived';
+    return n.status==='active';
+  };
+  const cards=state.notes.filter(n=>
+    n.note_type==='KNOWLEDGE_CARD'&&!n.is_deleted&&statusOk(n)&&matchQ(n)&&matchFilters(n)
+  );
 
-  const total=activeCards.length+draftCards.length+archivedCards.length;
+  const total=cards.length;
   const hasFilters=!!(state.kbFit||state.kbTier||state.kbLens.length||state.kbSector.length||state.kbType.length);
   document.getElementById('kb-count').textContent=`${total} card${total!==1?'s':''}${hasFilters?' (filtered)':''}`;
+  updateKBExpandBtn();
 
   const renderCard=c=>{
     const sd=c.structured_data||{};
     const sel=state.selectedKBId===c.note_id;
-    const tags=sd.kb_tags||{};
     const quality=sd.kb_quality||{};
     const tierCol=quality.tier==='A'?'var(--sage)':quality.tier==='B'?'var(--gold)':'var(--muted)';
     return `<div class="kb-card${sel?' selected':''}" tabindex="0" onclick="selectKB('${c.note_id}')" onkeydown="if(event.key==='Enter'||event.key===' ')selectKB('${c.note_id}')">
@@ -1731,7 +1797,7 @@ function renderKB(){
       </div>
       <div class="kb-card-title">${c.title||'(untitled)'}</div>
       <div class="kb-card-excerpt">${truncate(sd.core_insight||c.summary_short||'',110)}</div>
-      ${sd.storage_url?`<div style="margin-top:6px"><span style="font-size:10px;color:var(--brand);font-family:var(--mono);background:var(--bg-code);border:1px solid var(--border);border-radius:3px;padding:2px 6px">📄 doc</span></div>`:''}
+      ${sd.storage_url?`<div style="margin-top:6px"><span style="font-size:10px;font-family:var(--mono);background:var(--bg-code);border:1px solid var(--border);border-radius:3px;padding:2px 6px;color:var(--muted)">📄 doc</span></div>`:''}
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${(sd.best_use||[]).slice(0,3).map(u=>pill(u)).join('')}</div>
     </div>`;
   };
@@ -1741,17 +1807,35 @@ function renderKB(){
     grid.innerHTML=`<div class="kb-empty"><div style="font-size:28px;margin-bottom:12px">◈</div>No results${q?` for "${q}"`:''}${hasFilters?' — try clearing filters':''}.</div>`;
     return;
   }
+
+  // Group by domain
+  const domainMap={};
+  cards.forEach(c=>{
+    const domain=((c.structured_data||{}).kb_tags||{}).library_domain||'ld_insights_library';
+    if(!domainMap[domain]) domainMap[domain]=[];
+    domainMap[domain].push(c);
+  });
+
+  // Render in canonical domain order, then any unknown domains
+  const orderedKeys=[...Object.keys(KB_DOMAIN_META),...Object.keys(domainMap).filter(k=>!KB_DOMAIN_META[k])];
   let html='';
-  if(draftCards.length){
-    html+=`<div style="font-size:8px;letter-spacing:3px;color:var(--gold);font-family:var(--mono);text-transform:uppercase;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px">◈ Drafts — review &amp; promote</div>`;
-    html+=draftCards.map(renderCard).join('');
-    if(activeCards.length||archivedCards.length) html+=`<div style="height:1px;background:var(--border);margin:12px 0"></div>`;
-  }
-  html+=activeCards.map(renderCard).join('');
-  if(archivedCards.length){
-    html+=`<div style="font-size:8px;letter-spacing:3px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;padding:12px 0 8px">📁 Archived</div>`;
-    html+=archivedCards.map(renderCard).join('');
-  }
+  orderedKeys.forEach(domainId=>{
+    const domCards=domainMap[domainId];
+    if(!domCards||!domCards.length) return;
+    const meta=KB_DOMAIN_META[domainId]||{num:'—',label:domainId.replace(/^ld_/,'').replace(/_/g,' ')};
+    const collapsed=state.kbCollapsed.has(domainId);
+    html+=`<div class="kb-domain-section">
+      <div class="kb-domain-hdr${collapsed?' collapsed':''}" id="kbdh-${domainId}" onclick="toggleKBDomain('${domainId}')">
+        <span class="kb-domain-num">${meta.num}</span>
+        <span class="kb-domain-label">${meta.label}</span>
+        <span class="kb-domain-count">${domCards.length}</span>
+        <span class="kb-domain-chevron">▾</span>
+      </div>
+      <div class="kb-domain-cards${collapsed?' hidden':''}" id="kbdc-${domainId}">
+        ${domCards.map(renderCard).join('')}
+      </div>
+    </div>`;
+  });
   grid.innerHTML=html;
 }
 
