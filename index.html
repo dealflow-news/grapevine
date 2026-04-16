@@ -2567,7 +2567,7 @@ async function ingestBatch(){
         }
       }catch(e){console.warn('Batch enrich failed:',e);}
       const note={
-        note_type:'KNOWLEDGE_CARD', status:'draft', review_status:'pending',
+        note_type: state.dropNoteType||'KNOWLEDGE_CARD', status:'draft', review_status:'pending',
         capture_origin:'drop_point', source_type:item.source_type,
         evidence_type:'DOCUMENT', sensitivity_level:'PUBLIC', visibility_scope:'TEAM',
         intended_audience:'internal', time_sensitivity:'STRUCTURAL', confidence:'medium',
@@ -2674,7 +2674,7 @@ async function loadFile(file){
   if(!titleEl.value)titleEl.value=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
   const ext=file.name.split('.').pop().toLowerCase();
   if(ext==='mp3'){document.getElementById('dp-source-type').value='PODCAST_OR_MEDIA_TRANSCRIPT';setNoteType('KNOWLEDGE_CARD');}
-  else if(['pdf','docx','doc'].includes(ext)){document.getElementById('dp-source-type').value='BOOK_OR_ARTICLE_EXTRACT';setNoteType('KNOWLEDGE_CARD');}
+  else if(['pdf','docx','doc'].includes(ext)){document.getElementById('dp-source-type').value='BOOK_OR_ARTICLE_EXTRACT'; /* note_type stays as user selected */}
   // Store file object for AI enrichment at ingest time
   state.dropFile = file;
   state.dropFileText = '';
