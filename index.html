@@ -441,13 +441,11 @@ nav{padding:14px 0;flex:1;}
 
       <!-- TODAY — S1 Editorial Command Deck -->
       <div class="tab visible" id="tab-today">
-        <!-- Week Thesis banner -->
-        <div class="week-thesis-bar" onclick="toggleWeekThesis()">
+        <!-- Week Thesis banner — static, always visible -->
+        <div class="week-thesis-bar" style="cursor:default;">
           <span class="week-thesis-kicker" id="week-thesis-kicker">Week thesis</span>
           <span class="week-thesis-text" id="week-thesis-text">Loading…</span>
-          <span class="week-thesis-expand" id="week-thesis-expand">▾</span>
         </div>
-        <div class="week-thesis-full" id="week-thesis-full"></div>
         <!-- KPI Strip (E.2) -->
         <div class="today-kpi-strip">
           <div class="kpi-card">
@@ -525,6 +523,11 @@ nav{padding:14px 0;flex:1;}
   <div class="modal" style="max-width:600px;max-height:82vh;overflow-y:auto;">
     <div class="modal-title">⚙ Editorial Context Setup</div>
     <div class="modal-subtitle">Define what V4G follows this week. Saved to Supabase — shared and persistent.</div>
+    <div class="ep-form-section">
+      <div class="ep-section-hdr">Week Thesis</div>
+      <textarea class="ep-input" id="ep-thesis-text" rows="3" placeholder="One sharp sentence framing this week's editorial angle for V4G — Benelux lower mid-market M&A." style="resize:vertical;line-height:1.6;font-family:var(--serif);font-size:12px;width:100%;margin-bottom:6px;"></textarea>
+      <input class="ep-input" id="ep-thesis-rationale" type="text" placeholder="Rationale (optional — why this thesis now)" style="margin-bottom:0;">
+    </div>
     <div class="ep-form-section">
       <div class="ep-section-hdr">
         Coverage Beats <span id="ep-beat-count" style="color:var(--faint)">(0/7)</span>
@@ -2523,32 +2526,17 @@ function toggleWeekThesis(){
 function renderWeekThesis(){
   const kicker=document.getElementById('week-thesis-kicker');
   const text=document.getElementById('week-thesis-text');
-  const full=document.getElementById('week-thesis-full');
   if(!text)return;
   if(!state.weekThesis){
     if(kicker)kicker.textContent='Week thesis';
-    text.textContent='No week thesis set — generate one in Briefing Studio or add via Setup';
-    if(full)full.innerHTML='';
+    text.textContent='No week thesis set — click ⚙ Setup to add one';
     return;
   }
   const wt=state.weekThesis;
   const meta=wt.metadata||{};
   const weekStart=wt.week_start_date?new Date(wt.week_start_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
   if(kicker)kicker.textContent=weekStart?`Wk ${weekStart}`:'Week thesis';
-  const shortText=meta.week_thesis_text||wt.label||'—';
-  text.textContent=shortText;
-
-  // Expanded block — shows full metadata context
-  if(full){
-    const rows=[];
-    if(meta.rationale)          rows.push(`<div><span style="font-size:8px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase">Rationale</span><div style="margin-top:3px;font-size:12px;color:var(--txt2)">${meta.rationale}</div></div>`);
-    if(meta.sources_to_check)   rows.push(`<div><span style="font-size:8px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase">Sources to check</span><div style="margin-top:3px;font-size:12px;color:var(--muted);font-style:italic">${meta.sources_to_check}</div></div>`);
-    if(meta.editorial_angle)    rows.push(`<div><span style="font-size:8px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase">Editorial angle</span><div style="margin-top:3px;font-size:12px;color:var(--accent-txt)">${meta.editorial_angle}</div></div>`);
-    if(meta.red_flags)          rows.push(`<div><span style="font-size:8px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase">⚠ Red flags</span><div style="margin-top:3px;font-size:12px;color:var(--gold)">${meta.red_flags}</div></div>`);
-    full.innerHTML=rows.length
-      ?`<div style="display:flex;flex-direction:column;gap:10px;padding:4px 0">${rows.join('')}</div>`
-      :`<div style="color:var(--faint);font-size:11px;font-family:var(--mono)">No additional context — add rationale, sources, and angle via Setup or AI generation.</div>`;
-  }
+  text.textContent=meta.week_thesis_text||wt.label||'—';
 }
 
 // E.2 — KPI Strip
@@ -2851,6 +2839,12 @@ function openEPSetup(){
     watches:  JSON.parse(JSON.stringify(state.watches)),
     prospects:JSON.parse(JSON.stringify(state.prospects)),
   };
+  // Pre-fill week thesis fields
+  const meta=(state.weekThesis||{}).metadata||{};
+  const tt=document.getElementById('ep-thesis-text');
+  const tr=document.getElementById('ep-thesis-rationale');
+  if(tt) tt.value=meta.week_thesis_text||(state.weekThesis||{}).label||'';
+  if(tr) tr.value=meta.rationale||'';
   renderEPForm();
   document.getElementById('ep-modal').classList.add('open');
 }
@@ -2916,6 +2910,40 @@ async function saveEPSetup(){
   const status=document.getElementById('ep-save-status');
   status.textContent='Saving…';
   try{
+    // Save week thesis
+    const thesisText=(document.getElementById('ep-thesis-text')||{}).value||'';
+    const thesisRationale=(document.getElementById('ep-thesis-rationale')||{}).value||'';
+    if(thesisText.trim()){
+      const today=new Date().toISOString().slice(0,10);
+      // Get Monday of current week
+      const now=new Date();
+      const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()||7)-1));
+      const weekStart=mon.toISOString().slice(0,10);
+      const newMeta={
+        week_thesis_text:thesisText.trim(),
+        ...(thesisRationale.trim()?{rationale:thesisRationale.trim()}:{}),
+        reviewed_by:'chris',
+        updated_at:today,
+      };
+      if(state.weekThesis?.id){
+        // Patch existing record
+        await sbPatch('editorial_context',{id:`eq.${state.weekThesis.id}`},{
+          label:`Week of ${weekStart}`,
+          week_start_date:weekStart,
+          metadata:{...(state.weekThesis.metadata||{}),...newMeta},
+        });
+      } else {
+        // Insert new week thesis
+        await sbPost('editorial_context',[{
+          kind:'week_thesis', label:`Week of ${weekStart}`,
+          status:'active', source_mode:'editor_created',
+          week_start_date:weekStart,
+          is_active:true, sort_order:0,
+          metadata:newMeta,
+        }]);
+      }
+    }
+    // Soft-delete beats/watches/prospects and reinsert
     await sbPatch('editorial_context',
       {kind:'in.(coverage_beat,editorial_watch,latent_prospect)',is_active:'eq.true'},
       {is_active:false});
@@ -2938,6 +2966,7 @@ async function saveEPSetup(){
       })),
     ];
     if(rows.length) await sbPost('editorial_context', rows);
+    // Reload all
     const ec=await sbGet('editorial_context',{is_active:'eq.true',order:'kind.asc,sort_order.asc'});
     state.weekThesis = ec.find(p=>p.kind==='week_thesis')||null;
     state.beats      = ec.filter(p=>p.kind==='coverage_beat');
