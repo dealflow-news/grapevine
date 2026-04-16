@@ -165,7 +165,7 @@ nav{padding:14px 0;flex:1;}
 .kb-search input:focus{border-color:var(--accent);}
 .kb-search .clear{position:absolute;right:8px;top:6px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;}
 .kb-count{font-size:10px;letter-spacing:1px;color:var(--faint);font-family:var(--mono);white-space:nowrap;text-transform:uppercase;}
-.kb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:18px;}
+.kb-grid{display:grid;grid-template-columns:1fr;gap:14px;padding:18px;}
 .kb-card{background:var(--bg-e);border:1px solid var(--border);border-radius:8px;padding:18px;cursor:pointer;outline:none;transition:border-color .2s,box-shadow .2s,transform .15s;box-shadow:var(--shadow-sm);}
 .kb-card:hover{border-color:var(--muted);transform:translateY(-2px);box-shadow:var(--shadow);}
 .kb-card.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim);}
@@ -681,7 +681,7 @@ nav{padding:14px 0;flex:1;}
         <!-- Row 4: Active filter pills -->
         <div class="kb-pills-bar" id="kb-pills-bar" style="display:none;"></div>
         <div style="display:flex;flex:1;overflow:hidden;">
-          <div id="kb-grid-wrap" style="width:clamp(480px,52%,720px);flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);"><div class="kb-grid" id="kb-grid"></div></div>
+          <div id="kb-grid-wrap" style="width:420px;min-width:320px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);"><div class="kb-grid" id="kb-grid"></div></div>
           <div class="kb-detail" id="kb-detail"></div>
         </div>
       </div>
