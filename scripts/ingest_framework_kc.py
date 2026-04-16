@@ -250,11 +250,17 @@ FRAMEWORK_CARDS = [
   },
 ]
 
-def sb_post(data):
+EDGE_URL = SUPABASE_URL.replace('https://','https://').rstrip('/') + '/functions/v1/grapevine-to-card'
+
+def edge_ingest(note):
     r = httpx.post(
-        f'{SUPABASE_URL}/rest/v1/grapevine_notes',
-        json=data,
-        headers=HEADERS,
+        f'{EDGE_URL}/ingest',
+        json={'note': note},
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {SUPABASE_KEY}',
+            'apikey': SUPABASE_KEY,
+        },
         timeout=30
     )
     r.raise_for_status()
@@ -322,8 +328,8 @@ def main():
             continue
 
         try:
-            result = sb_post(note)
-            note_id = result[0]['note_id'] if result else 'unknown'
+            result = edge_ingest(note)
+            note_id = result.get('note_id','unknown')
             print(f"    ✓ {note_id[:8]} — {card['asset_class']} | {card['asset_type']}")
             ok += 1
         except Exception as e:

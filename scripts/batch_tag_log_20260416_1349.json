@@ -1,0 +1,65 @@
+[
+  {
+    "note_id": "c734a15e-8b94-4c21-a2b3-7f573cda057e",
+    "title": "US Funds in Belgian M&A: Three Friction Clusters That Kill Deals Before Signing",
+    "kb_tags": {
+      "library_domain": "ld_strategic_narratives",
+      "asset_type": "ka_failure_pattern",
+      "asset_class": "contextual",
+      "ma_lens": [
+        "ml_sell_side",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_regulatory_complexity",
+        "th_governance_alignment",
+        "th_founder_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "579b30e6-4222-49e8-93e4-841a47e931c3",
+    "title": "Fusies en overnames in Nederland — T.M. Stevens & S.B. Garcia Nelen",
+    "kb_tags": {
+      "library_domain": "ld_playbooks_training",
+      "asset_type": "ka_library_source",
+      "asset_class": "contextual",
+      "ma_lens": [
+        "ml_process_execution",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_regulatory_complexity",
+        "th_governance_alignment"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  },
+  {
+    "note_id": "5a9ffec3-f074-4894-b0ee-63452b905db2",
+    "title": "Trading Comparables & Peer Group Analysis for M&A Valuation",
+    "kb_tags": {
+      "library_domain": "ld_valuation_capital",
+      "asset_type": "ka_framework",
+      "asset_class": "contextual",
+      "ma_lens": [
+        "ml_valuation_pricing",
+        "ml_buy_side"
+      ],
+      "strategic_themes": [
+        "th_buyer_psychology"
+      ],
+      "sector": [
+        "sc_multi_sector"
+      ]
+    },
+    "confidence": "high"
+  }
+]

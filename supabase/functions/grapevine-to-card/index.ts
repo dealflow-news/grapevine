@@ -36,6 +36,7 @@ function supa(url: string, key: string) {
   };
 }
 
+// claude() returns parsed JSON — used by all existing routes
 async function claude(key: string, model: string, system: string, userMsg: any, maxTokens = 800) {
   const messages = Array.isArray(userMsg) ? userMsg : [{ role: 'user', content: userMsg }];
   const r = await fetch(ANTHROPIC_URL, {
@@ -50,6 +51,18 @@ async function claude(key: string, model: string, system: string, userMsg: any, 
   const s = cleaned.indexOf('{'); const e = cleaned.lastIndexOf('}') + 1;
   if (s < 0 || e <= 0) throw new Error(`No JSON in response: ${text.slice(0, 100)}`);
   return JSON.parse(cleaned.slice(s, e));
+}
+
+// claudeText() returns raw prose — used by /draft route only
+async function claudeText(key: string, model: string, system: string, userMsg: string, maxTokens = 1200): Promise<string> {
+  const r = await fetch(ANTHROPIC_URL, {
+    method: 'POST',
+    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: userMsg }] }),
+  });
+  if (!r.ok) throw new Error(`Anthropic ${r.status}: ${await r.text()}`);
+  const data = await r.json();
+  return data.content?.[0]?.text ?? '';
 }
 
 const json = (d: unknown, s = 200) =>
@@ -191,6 +204,22 @@ ${TAXONOMY_PROMPT}
 Return ONLY valid JSON:
 {"title":"<max 12 words>","core_insight":"<2-3 sentences>","deal_implication":"<2-3 sentences>","misread_risk":"<1-2 sentences>","best_use":["<use case 1>","<use case 2>","<use case 3>"],"library_domain":"ld_*","asset_type":"ka_*","asset_class":"commodity|contextual|proprietary","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"]}`;
 
+// ── Briefing Studio draft prompt ──────────────────────────────────────────────
+const SYS_DRAFT = `You are an editorial intelligence analyst for V4G — Ventures4Growth, a Benelux lower mid-market M&A advisory firm.
+Coverage: Belgium, Netherlands, Luxembourg, Northern France (Hauts-de-France, Grand Est). Deal range: €5–50M EV.
+Audience: founders, PE partners, family offices, boutique M&A advisors.
+
+Write sharp, credible editorial content grounded in the intel sources provided.
+Use conviction. Reference specific signals. Avoid corporate speak and generic observations.
+Protect identities — refer to companies/people by sector or role where needed.
+
+Output rules by format:
+- BRIEFING NOTE (200–300 words): structure as Thesis → Evidence → Implication. Concise paragraphs. No bullets unless essential.
+- NEWSLETTER PARAGRAPH (100–150 words): punchy editorial paragraph. Strong hook first. Name specific signals. One clear takeaway.
+- LINKEDIN POST (150–200 words): insight-led. First line must hook. End with a sharp observation or open question. No hashtag spam.
+
+Return only the final output text. No preamble, no labels, no commentary.`;
+
 // ── Helper: build kb_tags from LLM result ─────────────────────────────────────
 function buildKbTags(r: any) {
   return {
@@ -215,7 +244,7 @@ Deno.serve(async (req: Request) => {
   const path = new URL(req.url).pathname.replace(/.*\/grapevine-to-card/, '') || '/';
 
   if (path === '/health' || path === '/') {
-    return json({ status: 'ok', version: '1.5', anthropic_set: !!AK });
+    return json({ status: 'ok', version: '1.7', anthropic_set: !!AK });
   }
 
   if (req.method !== 'POST') return json({ error: 'POST required' }, 405);
@@ -374,6 +403,42 @@ Deno.serve(async (req: Request) => {
     try { await db(`grapevine_notes?note_id=eq.${noteId}`, 'PATCH', { structured_data: { ...sd, pattern_candidate: false } }); } catch { /**/ }
     const nn = Array.isArray(created) ? created[0] : created;
     return json({ ok: true, note_id: nn?.note_id ?? null, title: extracted.title, status: 'draft', source_note_id: noteId, kb_tags: kbTags });
+  }
+
+  // ── /draft — Briefing Studio editorial prose generation ─────────────────
+  if (path === '/draft') {
+    const { thesis_label = '', thesis_prompt = '', format = 'briefing', sources = [] } = body;
+    if (!thesis_label) return json({ error: 'thesis_label required' }, 400);
+    if (!Array.isArray(sources) || !sources.length) return json({ error: 'sources array required' }, 400);
+
+    const formatLabel: Record<string, string> = {
+      briefing:   'BRIEFING NOTE (200–300 words)',
+      newsletter: 'NEWSLETTER PARAGRAPH (100–150 words)',
+      linkedin:   'LINKEDIN POST (150–200 words)',
+    };
+    const fmtLabel = formatLabel[format] || formatLabel.briefing;
+
+    const sourceSummaries = (sources as any[]).slice(0, 6).map((s: any, i: number) => {
+      const body = (s.body || '').slice(0, 500);
+      return `[Source ${i + 1}] ${s.title || '(untitled)'}\nType: ${s.type || 'unknown'}\n${body}`;
+    }).join('\n\n---\n\n');
+
+    const userMsg = `Format: ${fmtLabel}
+
+Thesis: ${thesis_label}
+Analytical angle: ${thesis_prompt}
+
+Intel sources (${sources.length}):
+${sourceSummaries}
+
+Write a ${fmtLabel} grounded in these sources. Surface the signal, name the implication, give the reader a reason to act or think differently.`;
+
+    try {
+      const draft = await claudeText(AK, MODEL_SONNET, SYS_DRAFT, userMsg, 1200);
+      return json({ ok: true, draft, thesis: thesis_label, format });
+    } catch (e: any) {
+      return json({ error: `Draft generation failed: ${e.message}` }, 500);
+    }
   }
 
   return json({ error: 'not found' }, 404);
