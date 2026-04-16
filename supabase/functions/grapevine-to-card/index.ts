@@ -86,6 +86,16 @@ asset_type (exactly 1):
   ka_thesis = Strategic thesis (explicit investment thesis)
   ka_template = Template / reusable tool
   ka_checklist = Checklist / decision gate (tied to specific process gate)
+  ka_failure_pattern = Failure pattern (deal failure analysis, root cause, prevention)
+  ka_internal_standard = Internal standard (V4G house view, benchmark, norm)
+  ka_failure_pattern = Failure pattern (deal failure analysis, prevention, root causes)
+  ka_internal_standard = Internal standard (V4G house view, benchmark, proprietary norm)
+  ka_failure_pattern = Failure pattern (deal failure analysis & prevention)
+  ka_internal_standard = Internal standard / house view (V4G proprietary norms)
+  ka_failure_pattern = Failure pattern (deal failure analysis, preventable failure taxonomy)
+  ka_internal_standard = Internal standard (house view, V4G benchmark, internal norm)
+  ka_failure_pattern = Failure pattern (deal failure analysis, root cause, prevention)
+  ka_internal_standard = Internal standard (house view, V4G benchmark, internal norm)
 
 ma_lens (1-2, most specific first):
   ml_buy_side = Buy-side (acquirer strategy)
@@ -133,7 +143,12 @@ sector (0-2, sc_multi_sector ONLY if genuinely cross-sector):
   sc_energy_infra = Energy / infra
   sc_real_estate = Real estate / proptech
   sc_education_training = Education / training (edtech, corporate training)
-  sc_multi_sector = Multi-sector / cross-sector`;
+  sc_multi_sector = Multi-sector / cross-sector
+
+asset_class (exactly 1):
+  commodity = widely available (Bain, McKinsey, IMF) — credibility not differentiation
+  contextual = reframed with Benelux/V4G lens — you add the angle
+  proprietary = only V4G has it (internal memos, patterns, casenotes, failure registers)`;
 
 // ── System prompts ────────────────────────────────────────────────────────────
 
@@ -143,7 +158,8 @@ Evaluate if this file should be ingested into the Grapevine Knowledge Base for l
 ${TAXONOMY_PROMPT}
 
 Return ONLY valid JSON — no markdown:
-{"verdict":"ingest|review|skip","title":"<suggested title max 12 words>","library_domain":"ld_*","asset_type":"ka_*","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"],"tier":"A|B|C","benelux_fit":"direct=BE/NL/LU/FR(N)|analogous=EU|background","reason":"<one sentence>"}
+{"verdict":"ingest|review|skip","title":"<suggested title max 12 words>","library_domain":"ld_*","asset_type":"ka_*","asset_class":"commodity|contextual|proprietary","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"],"tier":"A|B|C","benelux_fit":"direct=BE/NL/LU/FR(N)|analogous=EU|background"
+asset_class: commodity=widely available (Bain/McKinsey/IMF) | contextual=reframed with Benelux lens | proprietary=only V4G has it (internal memos, deal patterns, casenotes),"reason":"<one sentence>"}
 
 Verdict: ingest=directly useful for BE/NL/LU/FR(N) deal work | review=potentially useful | skip=personal/admin/unrelated`;
 
@@ -154,7 +170,8 @@ Audience: founders, PE partners, family offices, boutique M&A advisors — BE/NL
 ${TAXONOMY_PROMPT}
 
 Return ONLY valid JSON — no markdown:
-{"title":"<max 12 words>","core_insight":"<2-3 sentences>","deal_implication":"<2-3 sentences>","misread_risk":"<1-2 sentences>","best_use":["<use case 1>","<use case 2>","<use case 3>"],"library_domain":"ld_*","asset_type":"ka_*","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"],"benelux_fit":"direct=BE/NL/LU/FR(N)|analogous=EU|background"}`;
+{"title":"<max 12 words>","core_insight":"<2-3 sentences>","deal_implication":"<2-3 sentences>","misread_risk":"<1-2 sentences>","best_use":["<use case 1>","<use case 2>","<use case 3>"],"library_domain":"ld_*","asset_type":"ka_*","asset_class":"commodity|contextual|proprietary","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"],"benelux_fit":"direct=BE/NL/LU/FR(N)|analogous=EU|background"
+asset_class: commodity=widely available (Bain/McKinsey/IMF) | contextual=reframed with Benelux lens | proprietary=only V4G has it (internal memos, deal patterns, casenotes)}`;
 
 const SYS_TAG_ONLY = `You are a senior editorial knowledge curator at a Benelux M&A platform.
 Assign canonical taxonomy tags to an existing KNOWLEDGE_CARD. Coverage region: BE/NL/LU + Northern France (Hauts-de-France, Grand Est), EV €5–50M.
@@ -162,7 +179,8 @@ Assign canonical taxonomy tags to an existing KNOWLEDGE_CARD. Coverage region: B
 ${TAXONOMY_PROMPT}
 
 Return ONLY valid JSON — no markdown:
-{"library_domain":"ld_*","asset_type":"ka_*","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"],"benelux_fit":"direct=BE/NL/LU/FR(N)|analogous=EU|background","confidence":"high|medium|low"}`;
+{"library_domain":"ld_*","asset_type":"ka_*","asset_class":"commodity|contextual|proprietary","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"],"benelux_fit":"direct=BE/NL/LU/FR(N)|analogous=EU|background"
+asset_class: commodity=widely available (Bain/McKinsey/IMF) | contextual=reframed with Benelux lens | proprietary=only V4G has it (internal memos, deal patterns, casenotes),"confidence":"high|medium|low"}`;
 
 const SYS_WHISPER = `You are a senior editorial intelligence editor at a Benelux M&A platform.
 Distil a WHISPER_NOTE pattern candidate into a reusable KNOWLEDGE_CARD and assign taxonomy tags.
@@ -171,13 +189,14 @@ Audience: founders, PE partners, family offices, boutique M&A advisors — BE/NL
 ${TAXONOMY_PROMPT}
 
 Return ONLY valid JSON:
-{"title":"<max 12 words>","core_insight":"<2-3 sentences>","deal_implication":"<2-3 sentences>","misread_risk":"<1-2 sentences>","best_use":["<use case 1>","<use case 2>","<use case 3>"],"library_domain":"ld_*","asset_type":"ka_*","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"]}`;
+{"title":"<max 12 words>","core_insight":"<2-3 sentences>","deal_implication":"<2-3 sentences>","misread_risk":"<1-2 sentences>","best_use":["<use case 1>","<use case 2>","<use case 3>"],"library_domain":"ld_*","asset_type":"ka_*","asset_class":"commodity|contextual|proprietary","ma_lens":["ml_*"],"strategic_themes":["th_*"],"sector":["sc_*"]}`;
 
 // ── Helper: build kb_tags from LLM result ─────────────────────────────────────
 function buildKbTags(r: any) {
   return {
     library_domain:    r.library_domain    || 'ld_insights_library',
     asset_type:        r.asset_type        || 'ka_library_source',
+    asset_class:       r.asset_class       || null,
     ma_lens:           Array.isArray(r.ma_lens)          ? r.ma_lens.slice(0, 2)          : [],
     strategic_themes:  Array.isArray(r.strategic_themes) ? r.strategic_themes.slice(0, 3) : [],
     sector:            Array.isArray(r.sector)            ? r.sector.slice(0, 2)           : [],
@@ -196,7 +215,7 @@ Deno.serve(async (req: Request) => {
   const path = new URL(req.url).pathname.replace(/.*\/grapevine-to-card/, '') || '/';
 
   if (path === '/health' || path === '/') {
-    return json({ status: 'ok', version: '1.4', anthropic_set: !!AK });
+    return json({ status: 'ok', version: '1.5', anthropic_set: !!AK });
   }
 
   if (req.method !== 'POST') return json({ error: 'POST required' }, 405);

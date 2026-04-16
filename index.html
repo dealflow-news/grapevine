@@ -1794,18 +1794,20 @@ const KBF_SECTOR = [
   {code:'sc_education_training',label:'Education / Training'},
 ];
 const KBF_ASSET = [
-  {code:'ka_pattern',       label:'Pattern',    color:'#e97c10'},
-  {code:'ka_playbook',      label:'Playbook',   color:'var(--accent-txt)'},
-  {code:'ka_framework',     label:'Framework',  color:'var(--blue-txt)'},
-  {code:'ka_case_note',     label:'Case note',  color:'#9b6fd6'},
-  {code:'ka_benchmark',     label:'Benchmark',  color:'var(--gold-txt)'},
-  {code:'ka_thesis',        label:'Thesis',     color:'#e05c6e'},
-  {code:'ka_library_source',label:'Library source', color:'var(--muted)'},
-  {code:'ka_editorial_angle',label:'Editorial', color:'var(--sage-txt)'},
-  {code:'ka_signal_digest', label:'Signal digest', color:'var(--faint)'},
-  {code:'ka_market_map',    label:'Market map', color:'var(--blue-txt)'},
-  {code:'ka_template',      label:'Template',   color:'var(--faint)'},
-  {code:'ka_training_note', label:'Training',   color:'var(--faint)'},
+  {code:'ka_pattern',          label:'Pattern',          color:'#e97c10'},
+  {code:'ka_failure_pattern',  label:'Failure pattern',  color:'#ef4444'},
+  {code:'ka_playbook',         label:'Playbook',         color:'var(--accent-txt)'},
+  {code:'ka_framework',        label:'Framework',        color:'var(--blue-txt)'},
+  {code:'ka_internal_standard',label:'Internal standard',color:'#f59e0b'},
+  {code:'ka_case_note',        label:'Case note',        color:'#9b6fd6'},
+  {code:'ka_benchmark',        label:'Benchmark',        color:'var(--gold-txt)'},
+  {code:'ka_thesis',           label:'Thesis',           color:'#e05c6e'},
+  {code:'ka_library_source',   label:'Library source',   color:'var(--muted)'},
+  {code:'ka_editorial_angle',  label:'Editorial',        color:'var(--sage-txt)'},
+  {code:'ka_signal_digest',    label:'Signal digest',    color:'var(--faint)'},
+  {code:'ka_market_map',       label:'Market map',       color:'var(--blue-txt)'},
+  {code:'ka_template',         label:'Template',         color:'var(--faint)'},
+  {code:'ka_training_note',    label:'Training',         color:'var(--faint)'},
 ];
 const KBF_OPTIONS = {lens:KBF_LENS, sector:KBF_SECTOR, asset:KBF_ASSET};
 const KBF_COLORS  = {lens:'var(--accent)', sector:'#e97c10', asset:'#9b6fd6'};
@@ -1934,7 +1936,10 @@ function matchKbfFilters(n){
   }
   if(state.kbAsset.length){
     const at=tags.asset_type||(n.structured_data||{}).card_type||'';
-    if(!state.kbAsset.includes(at)) return false;
+    // also check legacy card_type mapping
+    const legacyMap={'pattern':'ka_pattern','standard':'ka_internal_standard','library_source':'ka_library_source'};
+    const resolved=at||legacyMap[at]||'';
+    if(!state.kbAsset.some(a=>a===at||a===resolved)) return false;
   }
   return true;
 }
@@ -2016,6 +2021,7 @@ function renderKB(){
     const sel=state.selectedKBId===c.note_id;
     const t=(sd.kb_quality||{}).tier;
     const f=(sd.kb_quality||{}).benelux_fit;
+    const ac=(sd.kb_tags||{}).asset_class||'';
     const ct=sd.card_type||'';
     const icon=ct==='pattern'?'◈ ':ct==='standard'?'▣ ':'';
     return `<div class="kb-card${sel?' selected':''}" tabindex="0"
