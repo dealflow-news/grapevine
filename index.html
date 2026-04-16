@@ -2952,23 +2952,26 @@ async function saveEPSetup(){
     await sbPatch('editorial_context',
       {kind:'in.(coverage_beat,editorial_watch,latent_prospect)',is_active:'eq.true'},
       {is_active:false});
+    // Build rows with identical keyset — PostgREST requires all objects in batch to have same keys
+    const makeRow=(overrides)=>({
+      kind:null, label:null, status:'active', priority:null, source_mode:'editor_created',
+      lens_code:null, geo_scope:[], sector_codes:[], sort_order:0, is_active:true,
+      ...overrides,
+    });
     const rows=[
-      ..._epDraft.beats.filter(b=>b.label.trim()).map((b,i)=>({
+      ..._epDraft.beats.filter(b=>b.label.trim()).map((b,i)=>makeRow({
         kind:'coverage_beat', label:b.label.trim(),
         lens_code:b.lens_code||null,
         geo_scope:Array.isArray(b.geo_scope)?b.geo_scope:(b.geo_scope?[b.geo_scope]:[]),
-        sector_codes:[], status:'active', priority:b.priority||'P2',
-        sort_order:i+1, is_active:true, source_mode:'editor_created',
+        priority:b.priority||'P2', status:'active', sort_order:i+1,
       })),
-      ..._epDraft.watches.filter(w=>w.label.trim()).map((w,i)=>({
+      ..._epDraft.watches.filter(w=>w.label.trim()).map((w,i)=>makeRow({
         kind:'editorial_watch', label:w.label.trim(),
-        lens_code:w.lens_code||null, sector_codes:[],
-        status:w.status||'under_radar', sort_order:i+1, is_active:true, source_mode:'editor_created',
+        lens_code:w.lens_code||null, status:w.status||'under_radar', sort_order:i+1,
       })),
-      ..._epDraft.prospects.filter(p=>p.label.trim()).map((p,i)=>({
+      ..._epDraft.prospects.filter(p=>p.label.trim()).map((p,i)=>makeRow({
         kind:'latent_prospect', label:p.label.trim(),
-        lens_code:p.lens_code||null, sector_codes:[],
-        status:p.status||'hypothesis', sort_order:i+1, is_active:true, source_mode:'editor_created',
+        lens_code:p.lens_code||null, status:p.status||'hypothesis', sort_order:i+1,
       })),
     ];
     if(rows.length) await sbPost('editorial_context', rows);
