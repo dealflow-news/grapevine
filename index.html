@@ -282,6 +282,20 @@ nav{padding:14px 0;flex:1;}
 .kb-active-pill button{background:none;border:none;cursor:pointer;color:inherit;font-size:12px;padding:0;line-height:1;opacity:.7;}
 .kb-active-pill button:hover{opacity:1;}
 
+/* ── Today feed enhancements ─────────────────────────────────── */
+.feed-chips{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap;}
+.feed-chip{padding:2px 8px;border-radius:3px;border:1px solid var(--border);font-size:9px;font-family:var(--mono);cursor:pointer;background:transparent;color:var(--faint);transition:all .12s;letter-spacing:.3px;white-space:nowrap;}
+.feed-chip:hover{border-color:var(--muted);color:var(--txt);}
+.feed-chip.chip-dismiss:hover{border-color:var(--red);color:var(--red);}
+.feed-chip.chip-pin:hover{border-color:var(--gold);color:var(--gold-txt);}
+.feed-chip.chip-pin.pinned{border-color:var(--gold);color:var(--gold-txt);background:var(--gold-dim);}
+.feed-chip.chip-studio:hover{border-color:var(--accent);color:var(--accent-txt);background:var(--accent-dim);}
+.score-bar{height:2px;background:var(--border-sub);border-radius:1px;margin-top:8px;overflow:hidden;}
+.score-bar-fill{height:100%;border-radius:1px;}
+.cluster-banner{margin:8px 8px 2px;padding:8px 12px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:6px;display:flex;align-items:center;gap:8px;}
+.cluster-banner-txt{font-size:11px;color:var(--accent-txt);font-family:var(--mono);flex:1;letter-spacing:.2px;}
+.cluster-banner-cta{font-size:10px;color:var(--accent);font-family:var(--mono);cursor:pointer;white-space:nowrap;text-decoration:underline;}
+
 /* ── Today Tab ──────────────────────────────────────────────── */
 .today-kpi-strip{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;gap:8px;background:var(--bg-e);flex-shrink:0;}
 .kpi-card{background:var(--bg-r);border:1px solid var(--border);border-radius:7px;padding:10px 14px;flex:1;min-width:0;}
@@ -2408,7 +2422,12 @@ function renderTodayFeed(){
   let notes=state.notes.filter(n=>
     n.note_type==='WHISPER_NOTE'&&!n.is_deleted&&noteMatchesLens(n,lens)
   );
+
+  // Sort: pinned first, then score desc, then recency
   notes.sort((a,b)=>{
+    const pa=!!((a.structured_data||{}).pinned);
+    const pb=!!((b.structured_data||{}).pinned);
+    if(pb!==pa) return pb?1:-1;
     const sa=(a.structured_data||{}).newsworthiness_score||0;
     const sb=(b.structured_data||{}).newsworthiness_score||0;
     return sb!==sa?sb-sa:new Date(b.created_at)-new Date(a.created_at);
@@ -2418,28 +2437,54 @@ function renderTodayFeed(){
     el.innerHTML=`<div class="empty-list" style="padding:32px;color:var(--faint);font-size:12px;font-family:var(--mono);text-align:center">No signals${lens?' for this lens':''}</div>`;
     return;
   }
-  el.innerHTML=`<div class="list-section-hdr">SIGNALS · ${notes.length}</div>`
-    +notes.slice(0,50).map(n=>{
-      const sel=state.todaySelectedId===n.note_id;
-      const sd=n.structured_data||{};
-      const score=sd.newsworthiness_score;
-      const scoreCol=score>=7?'var(--sage-txt)':score>=4?'var(--gold-txt)':'var(--faint)';
-      const statusCol=n.status==='active'?'var(--sage-txt)':'var(--faint)';
-      const statusBg=n.status==='active'?'var(--sage-dim)':'var(--bg-code)';
-      return `<div class="list-item${sel?' selected':''}" onclick="selectTodayNote('${n.note_id}')">
-        <div class="list-item-badges">
-          ${badge(n.status,statusCol,statusBg)}
-          ${score?`<span style="font-family:var(--mono);font-size:10px;color:${scoreCol};font-weight:700">${score}/10</span>`:''}
-          <span class="list-freshness">${timeAgo(n.created_at)}</span>
-        </div>
-        <div class="list-item-title">${n.title||'(untitled)'}</div>
-        <div class="list-item-pills">
-          ${n.geo_country?pill(n.geo_country):''}
-          ${n.sector_code?pill(n.sector_code):''}
-          ${sd.pattern_candidate?badge('◉ candidate','var(--gold-txt)','var(--gold-dim)'):''}
-        </div>
+
+  // Cluster banner — only when lens active + ≥3 signals share a sector
+  let clusterBanner='';
+  if(state.activeLens){
+    const smap={};
+    notes.forEach(n=>{if(n.sector_code)smap[n.sector_code]=(smap[n.sector_code]||0)+1;});
+    const top=Object.entries(smap).filter(([,c])=>c>=3).sort((a,b)=>b[1]-a[1])[0];
+    if(top){
+      const lensLabel=LENS_PRESETS.find(l=>l.id===state.activeLens)?.label||'';
+      clusterBanner=`<div class="cluster-banner">
+        <span class="cluster-banner-txt">◉ ${top[1]} signals converge · ${top[0]} · ${lensLabel}</span>
+        <span class="cluster-banner-cta" onclick="state.activeLens=null;renderTodayLensBar();renderTodayFeed()">Clear lens →</span>
       </div>`;
-    }).join('');
+    }
+  }
+
+  const itemsHtml=notes.slice(0,50).map(n=>{
+    const sel=state.todaySelectedId===n.note_id;
+    const sd=n.structured_data||{};
+    const score=sd.newsworthiness_score;
+    const pinned=!!sd.pinned;
+    const scoreCol=score>=7?'var(--sage-txt)':score>=4?'var(--gold-txt)':'var(--faint)';
+    const barCol=score>=7?'var(--sage)':score>=4?'var(--gold)':'var(--muted)';
+    const statusCol=n.status==='active'?'var(--sage-txt)':'var(--faint)';
+    const statusBg=n.status==='active'?'var(--sage-dim)':'var(--bg-code)';
+    return `<div class="list-item${sel?' selected':''}" onclick="selectTodayNote('${n.note_id}')">
+      <div class="list-item-badges">
+        ${badge(n.status,statusCol,statusBg)}
+        ${pinned?badge('📌','var(--gold-txt)','var(--gold-dim)'):''}
+        ${score?`<span style="font-family:var(--mono);font-size:10px;color:${scoreCol};font-weight:700">${score}/10</span>`:''}
+        <span class="list-freshness">${timeAgo(n.created_at)}</span>
+      </div>
+      <div class="list-item-title">${n.title||'(untitled)'}</div>
+      <div class="list-item-pills">
+        ${n.geo_country?pill(n.geo_country):''}
+        ${n.sector_code?pill(n.sector_code):''}
+        ${sd.pattern_candidate?badge('◉','var(--gold-txt)','var(--gold-dim)'):''}
+      </div>
+      ${score?`<div class="score-bar"><div class="score-bar-fill" style="width:${score*10}%;background:${barCol}"></div></div>`:''}
+      <div class="feed-chips" onclick="event.stopPropagation()">
+        <button class="feed-chip chip-dismiss" onclick="dismissTodaySignal('${n.note_id}')">✕ Dismiss</button>
+        <button class="feed-chip chip-pin${pinned?' pinned':''}" onclick="pinTodaySignal('${n.note_id}')">${pinned?'📌 Pinned':'📌 Pin'}</button>
+        <button class="feed-chip chip-studio" onclick="sendToStudio('${n.note_id}')">→ Studio</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=clusterBanner+`<div class="list-section-hdr">SIGNALS · ${notes.length}</div>`+itemsHtml;
 }
 
 function selectTodayNote(id){
@@ -2480,6 +2525,46 @@ function selectTodayNote(id){
       <button class="btn-primary" style="flex:none;font-size:11px;padding:7px 14px"
         onclick="switchTab('curate');state.curateFilter='${n.status}';renderCurateList();selectCurate('${n.note_id}')">Open in Curate →</button>
     </div>`;
+}
+
+// ── Today feed actions ────────────────────────────────────────
+async function dismissTodaySignal(id){
+  try{
+    await sbPatch('grapevine_notes',{'note_id':`eq.${id}`},{status:'archived'});
+    state.notes=state.notes.map(n=>n.note_id===id?{...n,status:'archived'}:n);
+    if(state.todaySelectedId===id){
+      state.todaySelectedId=null;
+      const empty=document.getElementById('today-detail-empty');
+      const el=document.getElementById('today-detail');
+      if(empty)empty.style.display='flex';
+      if(el)el.style.display='none';
+    }
+    renderTodayFeed();
+    renderTodayKPI();
+    showToast('✓ Signal archived');
+  }catch(e){showToast('Failed: '+e.message,'error');}
+}
+
+async function pinTodaySignal(id){
+  const n=state.notes.find(x=>x.note_id===id);
+  if(!n)return;
+  const sd=n.structured_data||{};
+  const newPinned=!sd.pinned;
+  try{
+    await sbPatch('grapevine_notes',{'note_id':`eq.${id}`},{structured_data:{...sd,pinned:newPinned}});
+    n.structured_data={...sd,pinned:newPinned};
+    renderTodayFeed();
+    showToast(newPinned?'📌 Pinned — appears at top of feed':'📌 Unpinned');
+  }catch(e){showToast('Failed: '+e.message,'error');}
+}
+
+function sendToStudio(id){
+  if(state.studioSources.size>=6){showToast('Studio already has 6 sources — clear some first','warn');return;}
+  state.studioSources.add(id);
+  switchTab('studio');
+  renderStudioSources();
+  updateStudioGenerateBtn();
+  showToast(`→ Added to Briefing Studio · ${state.studioSources.size}/6 sources selected`);
 }
 
 // E.5 — Pattern Resurfacing
