@@ -548,7 +548,7 @@ nav{padding:14px 0;flex:1;}
         <button class="ep-add-btn" onclick="epAddRow('prospect')">+ Add prospect</button>
       </div>
       <div style="font-size:10px;color:var(--faint);font-family:var(--mono);margin-bottom:8px;padding:6px 10px;background:var(--wine-dim);border-radius:4px;border:1px solid var(--wine)">
-        🔒 Strictly internal — commercially sensitive. Never shown outside this workspace. Never included in briefing output.
+        🔒 Intelligence OS only — V4G commercial lens, nooit Dealflow.News. Strictly internal — commercially sensitive. Never shown outside this workspace. Never included in briefing output.
       </div>
       <div id="ep-prospects-form"></div>
     </div>
@@ -2764,7 +2764,9 @@ function renderTodayBeats(){
     const total=whispers.filter(matchBeat).length;
     const newW=thisWeekW.filter(matchBeat).length;
     const col=total>=3?'var(--sage)':total>=1?'var(--gold)':'var(--faint)';
+    const pCol=b.priority==='P1'?'var(--sage-txt)':b.priority==='P3'?'var(--faint)':'var(--accent-txt)';
     return `<div class="beat-item">
+      ${b.priority?`<span style="font-size:9px;font-family:var(--mono);color:${pCol};flex-shrink:0;width:18px">${b.priority}</span>`:'<span style="width:18px;flex-shrink:0"></span>'}
       <span class="beat-label">${b.label}</span>
       <span class="beat-count" style="color:${col}">${total}</span>
       ${newW>0?`<span class="beat-trend">+${newW}↑</span>`:'<span style="font-size:9px;color:var(--faint);font-family:var(--mono)">—</span>'}
@@ -2855,6 +2857,7 @@ function closeEPSetup(){
 function renderEPForm(){
   const lensOpts=LENS_PRESETS.map(l=>`<option value="${l.id}">${l.label}</option>`).join('');
   const geoOpts=['BE','NL','LU','BENELUX','FR_N'].map(g=>`<option value="${g}">${g}</option>`).join('');
+  const prioOpts=['P1','P2','P3'].map(p=>`<option value="${p}">${p}</option>`).join('');
   const mkSel=(opts,val)=>opts.replace(`"${val}"`,`"${val}" selected`);
 
   document.getElementById('ep-beat-count').textContent=`(${_epDraft.beats.length}/7)`;
@@ -2864,12 +2867,14 @@ function renderEPForm(){
       <input class="ep-input" placeholder="Beat label" value="${(b.label||'').replace(/"/g,'&quot;')}" oninput="_epDraft.beats[${i}].label=this.value">
       <select class="ep-select" onchange="_epDraft.beats[${i}].lens_code=this.value"><option value="">Lens</option>${mkSel(lensOpts,b.lens_code||'')}</select>
       <select class="ep-select" onchange="_epDraft.beats[${i}].geo_scope=this.value?[this.value]:[]"><option value="">Geo</option>${mkSel(geoOpts,(b.geo_scope||[])[0]||'')}</select>
+      <select class="ep-select" style="width:52px;flex-shrink:0" onchange="_epDraft.beats[${i}].priority=this.value">${mkSel(prioOpts,b.priority||'P2')}</select>
       <button class="ep-btn-remove" onclick="epRemoveBeat(${i})">×</button>
     </div>`).join('');
 
   document.getElementById('ep-watch-count').textContent=`(${_epDraft.watches.length}/3)`;
   const wf=document.getElementById('ep-watches-form');
-  const swOpts=['under_radar','in_preparation','live','published'].map(s=>`<option value="${s}">${s.replace(/_/g,' ')}</option>`).join('');
+  // Internal-only status set — live/published belong in Briefing Studio output, not here
+  const swOpts=['under_radar','in_preparation','ready_to_pitch'].map(s=>`<option value="${s}">${s.replace(/_/g,' ')}</option>`).join('');
   if(wf) wf.innerHTML=_epDraft.watches.map((w,i)=>`
     <div class="ep-row">
       <input class="ep-input" placeholder="Watch label" value="${(w.label||'').replace(/"/g,'&quot;')}" oninput="_epDraft.watches[${i}].label=this.value">
@@ -2893,7 +2898,7 @@ function renderEPForm(){
 function epAddRow(kind){
   if(kind==='beat'){
     if(_epDraft.beats.length>=7){showToast('Maximum 7 beats','warn');return;}
-    _epDraft.beats.push({label:'',lens_code:'',geo_scope:['BE'],status:'active'});
+    _epDraft.beats.push({label:'',lens_code:'',geo_scope:['BE'],status:'active',priority:'P2'});
   } else if(kind==='watch'){
     if(_epDraft.watches.length>=3){showToast('Maximum 3 watches','warn');return;}
     _epDraft.watches.push({label:'',lens_code:'',status:'under_radar'});
@@ -2952,7 +2957,8 @@ async function saveEPSetup(){
         kind:'coverage_beat', label:b.label.trim(),
         lens_code:b.lens_code||null,
         geo_scope:Array.isArray(b.geo_scope)?b.geo_scope:(b.geo_scope?[b.geo_scope]:[]),
-        sector_codes:[], status:'active', sort_order:i+1, is_active:true, source_mode:'editor_created',
+        sector_codes:[], status:'active', priority:b.priority||'P2',
+        sort_order:i+1, is_active:true, source_mode:'editor_created',
       })),
       ..._epDraft.watches.filter(w=>w.label.trim()).map((w,i)=>({
         kind:'editorial_watch', label:w.label.trim(),
