@@ -249,6 +249,27 @@ nav{padding:14px 0;flex:1;}
 
 /* Toast */
 
+/* ── KB Filter Rows ─────────────────────────────────────────── */
+.kb-filter-bar{padding:7px 18px;border-bottom:1px solid var(--border);display:flex;gap:6px;background:var(--bg-e);flex-shrink:0;align-items:center;flex-wrap:wrap;}
+.kb-pills-bar{padding:5px 18px;border-bottom:1px solid var(--border);display:flex;gap:5px;background:var(--bg-e);flex-shrink:0;flex-wrap:wrap;align-items:center;}
+.kb-filter-btn{padding:4px 11px;border-radius:4px;border:1px solid var(--border);font-size:10px;font-family:var(--mono);cursor:pointer;background:transparent;color:var(--muted);transition:all .15s;white-space:nowrap;letter-spacing:.3px;}
+.kb-filter-btn:hover{border-color:var(--muted);color:var(--txt);}
+.kb-filter-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-txt);}
+.kb-filter-btn.fit-active{background:var(--sage-dim);border-color:var(--sage);color:var(--sage-txt);}
+.kb-filter-btn.tier-a{} .kb-filter-btn.tier-a.active{background:var(--sage-dim);border-color:var(--sage);color:var(--sage-txt);}
+.kb-filter-btn.tier-b.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold-txt);}
+.kb-filter-btn.tier-c.active{background:var(--bg-r);border-color:var(--muted);color:var(--muted);}
+.kb-dd-wrap{position:relative;}
+.kb-dd-panel{position:absolute;top:calc(100% + 5px);left:0;z-index:300;background:var(--bg-e);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);min-width:190px;max-height:260px;display:none;flex-direction:column;overflow:hidden;}
+.kb-dd-panel.open{display:flex;}
+.kb-dd-list{overflow-y:auto;flex:1;padding:4px 0;}
+.kb-dd-item{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;font-size:11px;color:var(--txt2);font-family:var(--mono);transition:background .1s;}
+.kb-dd-item:hover{background:var(--bg-r);}
+.kb-dd-item.sel{color:var(--accent-txt);background:var(--accent-dim);}
+.kb-active-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:10px;font-size:10px;font-family:var(--mono);}
+.kb-active-pill button{background:none;border:none;cursor:pointer;color:inherit;font-size:12px;padding:0;line-height:1;opacity:.7;}
+.kb-active-pill button:hover{opacity:1;}
+
 /* ── Today Tab ──────────────────────────────────────────────── */
 .today-kpi-strip{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;gap:8px;background:var(--bg-e);flex-shrink:0;}
 .kpi-card{background:var(--bg-r);border:1px solid var(--border);border-radius:7px;padding:10px 14px;flex:1;min-width:0;}
@@ -471,6 +492,7 @@ nav{padding:14px 0;flex:1;}
 
       <!-- KNOWLEDGE BASE -->
       <div class="tab" id="tab-kb">
+        <!-- Row 1: Search + count + toggles -->
         <div class="kb-toolbar">
           <div class="kb-search">
             <input type="text" id="kb-input" placeholder="Search patterns, sectors, use cases…" oninput="renderKB()"/>
@@ -480,10 +502,34 @@ nav{padding:14px 0;flex:1;}
           <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;">
             <input type="checkbox" id="kb-show-drafts" onchange="closeKBDetail();renderKB()"> Show drafts
           </label>
-          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:10px;">
+          <label style="font-size:10px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:6px;">
             <input type="checkbox" id="kb-show-archived" onchange="renderKB()"> Include archived
           </label>
         </div>
+        <!-- Row 2: Smart filters -->
+        <div class="kb-filter-bar">
+          <button class="kb-filter-btn fit-btn" id="kb-fit-direct" onclick="toggleKBFit('direct')">🎯 Benelux+FR(N)</button>
+          <div style="width:1px;background:var(--border);margin:0 2px;align-self:stretch;"></div>
+          <button class="kb-filter-btn tier-a" id="kb-tier-a" onclick="toggleKBTier('A')">Tier A</button>
+          <button class="kb-filter-btn tier-b" id="kb-tier-b" onclick="toggleKBTier('B')">Tier B</button>
+          <button class="kb-filter-btn tier-c" id="kb-tier-c" onclick="toggleKBTier('C')">Tier C</button>
+          <div style="width:1px;background:var(--border);margin:0 2px;align-self:stretch;"></div>
+          <div class="kb-dd-wrap">
+            <button class="kb-filter-btn" id="kb-dd-btn-lens" onclick="toggleKBDropdown('lens',event)">Lens ▾</button>
+            <div class="kb-dd-panel" id="kb-dd-lens"><div class="kb-dd-list" id="kb-dd-lens-list"></div></div>
+          </div>
+          <div class="kb-dd-wrap">
+            <button class="kb-filter-btn" id="kb-dd-btn-sector" onclick="toggleKBDropdown('sector',event)">Sector ▾</button>
+            <div class="kb-dd-panel" id="kb-dd-sector"><div class="kb-dd-list" id="kb-dd-sector-list"></div></div>
+          </div>
+          <div class="kb-dd-wrap">
+            <button class="kb-filter-btn" id="kb-dd-btn-type" onclick="toggleKBDropdown('type',event)">Type ▾</button>
+            <div class="kb-dd-panel" id="kb-dd-type"><div class="kb-dd-list" id="kb-dd-type-list"></div></div>
+          </div>
+          <button class="kb-filter-btn" style="margin-left:auto;opacity:.55" onclick="clearKBFilters()">✕ Clear filters</button>
+        </div>
+        <!-- Row 3: Active filter pills -->
+        <div class="kb-pills-bar" id="kb-pills-bar" style="display:none;"></div>
         <div style="display:flex;flex:1;overflow:hidden;">
           <div id="kb-grid-wrap" style="width:420px;min-width:320px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);"><div class="kb-grid" id="kb-grid"></div></div>
           <div class="kb-detail" id="kb-detail"></div>
@@ -810,6 +856,11 @@ const state = {
   studioThesis: null,
   studioSources: new Set(),
   studioFormat: 'briefing',
+  kbLens: [],
+  kbSector: [],
+  kbType: [],
+  kbTier: null,
+  kbFit: null,
   selectedKBId: null,
   promoteTargetId: null,
   promoteAudience: 'internal',
@@ -1491,53 +1542,205 @@ function closeKBDetail(){
   if(kg) kg.style.gridTemplateColumns='';
 }
 
+// ═══════════════════════════════════════════════════════════════
+// KB SMART FILTERS
+// ═══════════════════════════════════════════════════════════════
+
+const KB_LENS_OPTIONS=[
+  {id:'ml_buy_side',label:'Buy-side'},{id:'ml_sell_side',label:'Sell-side'},
+  {id:'ml_succession',label:'Succession'},{id:'ml_growth_capital',label:'Growth Capital'},
+  {id:'ml_mbo_mbi',label:'MBO / MBI'},{id:'ml_carveout',label:'Carve-out'},
+  {id:'ml_pe_investing',label:'PE Investing'},{id:'ml_search_fund',label:'Search Fund'},
+  {id:'ml_partnerships_jv',label:'Partnership / JV'},{id:'ml_post_merger_integration',label:'PMI'},
+  {id:'ml_valuation_pricing',label:'Valuation'},{id:'ml_process_execution',label:'Process'},
+];
+const KB_SECTOR_OPTIONS=[
+  {id:'sc_software_it',label:'Software / IT'},{id:'sc_healthcare',label:'Healthcare'},
+  {id:'sc_industrials',label:'Industrials'},{id:'sc_business_services',label:'Business Services'},
+  {id:'sc_financial_services',label:'Financial Services'},{id:'sc_consumer',label:'Consumer'},
+  {id:'sc_food_agri',label:'Food & Agri'},{id:'sc_logistics_transport',label:'Logistics'},
+  {id:'sc_energy_infra',label:'Energy / Infra'},{id:'sc_real_estate',label:'Real Estate'},
+  {id:'sc_education_training',label:'Education'},{id:'sc_multi_sector',label:'Multi-sector'},
+];
+const KB_TYPE_OPTIONS=[
+  {id:'ka_library_source',label:'Library Source'},{id:'ka_pattern',label:'Pattern'},
+  {id:'ka_playbook',label:'Playbook'},{id:'ka_framework',label:'Framework'},
+  {id:'ka_training_note',label:'Training Note'},{id:'ka_editorial_angle',label:'Editorial Angle'},
+  {id:'ka_case_note',label:'Case Note'},{id:'ka_benchmark',label:'Benchmark'},
+  {id:'ka_market_map',label:'Market Map'},{id:'ka_signal_digest',label:'Signal Digest'},
+  {id:'ka_thesis',label:'Thesis'},{id:'ka_template',label:'Template'},
+  {id:'ka_checklist',label:'Checklist'},{id:'ka_failure_pattern',label:'Failure Pattern'},
+  {id:'ka_internal_standard',label:'Internal Standard'},
+];
+
+function initKBFilters(){
+  renderKBDropdownList('lens',   KB_LENS_OPTIONS,   state.kbLens,   'toggleKBLens');
+  renderKBDropdownList('sector', KB_SECTOR_OPTIONS, state.kbSector, 'toggleKBSector');
+  renderKBDropdownList('type',   KB_TYPE_OPTIONS,   state.kbType,   'toggleKBType');
+  // Close dropdowns on outside click
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('.kb-dd-wrap')) closeKBDropdowns();
+  });
+}
+
+function renderKBDropdownList(which, options, selected, toggleFn){
+  const el=document.getElementById(`kb-dd-${which}-list`);
+  if(!el) return;
+  el.innerHTML=options.map(o=>
+    `<div class="kb-dd-item${selected.includes(o.id)?' sel':''}" onclick="${toggleFn}('${o.id}')">
+      <span style="font-size:11px">${selected.includes(o.id)?'☑':'☐'}</span>${o.label}
+    </div>`
+  ).join('');
+}
+
+function toggleKBDropdown(which, e){
+  if(e){e.stopPropagation();}
+  const panel=document.getElementById(`kb-dd-${which}`);
+  if(!panel) return;
+  const wasOpen=panel.classList.contains('open');
+  closeKBDropdowns();
+  if(!wasOpen) panel.classList.add('open');
+}
+function closeKBDropdowns(){
+  ['lens','sector','type'].forEach(w=>{
+    const p=document.getElementById(`kb-dd-${w}`);
+    if(p) p.classList.remove('open');
+  });
+}
+
+function toggleKBFit(val){
+  state.kbFit=state.kbFit===val?null:val;
+  const btn=document.getElementById('kb-fit-direct');
+  if(btn) btn.classList.toggle('fit-active', !!state.kbFit);
+  updateKBPills(); renderKB();
+}
+
+function toggleKBTier(val){
+  state.kbTier=state.kbTier===val?null:val;
+  ['A','B','C'].forEach(t=>{
+    const b=document.getElementById(`kb-tier-${t.toLowerCase()}`);
+    if(b) b.classList.toggle('active', state.kbTier===t);
+  });
+  updateKBPills(); renderKB();
+}
+
+function toggleKBLens(code){
+  const i=state.kbLens.indexOf(code);
+  if(i>=0) state.kbLens.splice(i,1); else state.kbLens.push(code);
+  renderKBDropdownList('lens', KB_LENS_OPTIONS, state.kbLens, 'toggleKBLens');
+  const btn=document.getElementById('kb-dd-btn-lens');
+  if(btn) btn.classList.toggle('active', state.kbLens.length>0);
+  if(btn&&state.kbLens.length) btn.textContent=`Lens (${state.kbLens.length}) ▾`; else if(btn) btn.textContent='Lens ▾';
+  updateKBPills(); renderKB();
+}
+
+function toggleKBSector(code){
+  const i=state.kbSector.indexOf(code);
+  if(i>=0) state.kbSector.splice(i,1); else state.kbSector.push(code);
+  renderKBDropdownList('sector', KB_SECTOR_OPTIONS, state.kbSector, 'toggleKBSector');
+  const btn=document.getElementById('kb-dd-btn-sector');
+  if(btn) btn.classList.toggle('active', state.kbSector.length>0);
+  if(btn&&state.kbSector.length) btn.textContent=`Sector (${state.kbSector.length}) ▾`; else if(btn) btn.textContent='Sector ▾';
+  updateKBPills(); renderKB();
+}
+
+function toggleKBType(code){
+  const i=state.kbType.indexOf(code);
+  if(i>=0) state.kbType.splice(i,1); else state.kbType.push(code);
+  renderKBDropdownList('type', KB_TYPE_OPTIONS, state.kbType, 'toggleKBType');
+  const btn=document.getElementById('kb-dd-btn-type');
+  if(btn) btn.classList.toggle('active', state.kbType.length>0);
+  if(btn&&state.kbType.length) btn.textContent=`Type (${state.kbType.length}) ▾`; else if(btn) btn.textContent='Type ▾';
+  updateKBPills(); renderKB();
+}
+
+function removeKBLens(code){ toggleKBLens(code); }
+function removeKBSector(code){ toggleKBSector(code); }
+function removeKBType(code){ toggleKBType(code); }
+
+function clearKBFilters(){
+  state.kbFit=null; state.kbTier=null;
+  state.kbLens=[]; state.kbSector=[]; state.kbType=[];
+  initKBFilters();
+  ['A','B','C'].forEach(t=>{const b=document.getElementById(`kb-tier-${t.toLowerCase()}`);if(b)b.classList.remove('active');});
+  const fd=document.getElementById('kb-fit-direct');if(fd)fd.classList.remove('fit-active');
+  ['lens','sector','type'].forEach(w=>{const b=document.getElementById(`kb-dd-btn-${w}`);if(b){b.classList.remove('active');b.textContent=w.charAt(0).toUpperCase()+w.slice(1)+' ▾';}});
+  updateKBPills(); renderKB();
+}
+
+function updateKBPills(){
+  const bar=document.getElementById('kb-pills-bar');
+  if(!bar) return;
+  let html='';
+  if(state.kbFit) html+=`<span class="kb-active-pill" style="color:var(--sage-txt);background:var(--sage-dim);border:1px solid var(--sage)">🎯 ${state.kbFit}<button onclick="toggleKBFit('${state.kbFit}')">×</button></span>`;
+  if(state.kbTier) html+=`<span class="kb-active-pill" style="color:var(--accent-txt);background:var(--accent-dim);border:1px solid var(--accent)">Tier ${state.kbTier}<button onclick="toggleKBTier('${state.kbTier}')">×</button></span>`;
+  state.kbLens.forEach(c=>{const o=KB_LENS_OPTIONS.find(x=>x.id===c);if(o)html+=`<span class="kb-active-pill" style="color:var(--sage-txt);background:var(--sage-dim);border:1px solid var(--sage)">${o.label}<button onclick="removeKBLens('${c}')">×</button></span>`;});
+  state.kbSector.forEach(c=>{const o=KB_SECTOR_OPTIONS.find(x=>x.id===c);if(o)html+=`<span class="kb-active-pill" style="color:var(--gold-txt);background:var(--gold-dim);border:1px solid var(--gold)">${o.label}<button onclick="removeKBSector('${c}')">×</button></span>`;});
+  state.kbType.forEach(c=>{const o=KB_TYPE_OPTIONS.find(x=>x.id===c);if(o)html+=`<span class="kb-active-pill" style="color:var(--wine-txt);background:var(--wine-dim);border:1px solid var(--wine)">${o.label}<button onclick="removeKBType('${c}')">×</button></span>`;});
+  bar.style.display=html?'flex':'none';
+  bar.innerHTML=html;
+}
+
 function renderKB(){
   const q=(document.getElementById('kb-input').value||'').toLowerCase().trim();
   const showDrafts=document.getElementById('kb-show-drafts').checked;
   const showArchived=document.getElementById('kb-show-archived').checked;
 
-  const matchQ = n => {
+  const matchQ=n=>{
     if(q.length<2) return true;
     const sd=n.structured_data||{};
-    return n.title.toLowerCase().includes(q)||
+    return (n.title||'').toLowerCase().includes(q)||
       (sd.core_insight||'').toLowerCase().includes(q)||
       (sd.best_use||[]).some(b=>b.toLowerCase().includes(q))||
-      (n.sector_code||'').toLowerCase().includes(q);
+      (n.sector_code||'').toLowerCase().includes(q)||
+      (sd.newsletter_angle||'').toLowerCase().includes(q);
   };
 
-  // Active: shown unless drafts mode is on
-  const activeCards   = !showDrafts ? state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='active'&&!n.is_deleted&&matchQ(n)) : [];
-  // Drafts: shown only when toggle on (replaces active view)
-  const draftCards    = showDrafts   ? state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='draft'  &&!n.is_deleted&&matchQ(n)) : [];
-  // Archived only when toggle on
-  const archivedCards = showArchived ? state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='archived'&&!n.is_deleted&&matchQ(n)) : [];
+  const matchFilters=n=>{
+    const sd=n.structured_data||{};
+    const tags=sd.kb_tags||{};
+    const quality=sd.kb_quality||{};
+    if(state.kbFit&&quality.benelux_fit!==state.kbFit) return false;
+    if(state.kbTier&&quality.tier!==state.kbTier) return false;
+    if(state.kbLens.length&&!state.kbLens.some(l=>(tags.ma_lens||[]).includes(l))) return false;
+    if(state.kbSector.length&&!state.kbSector.some(s=>(tags.sector||[]).includes(s))) return false;
+    if(state.kbType.length&&!state.kbType.includes(tags.asset_type)) return false;
+    return true;
+  };
 
-  const total = activeCards.length + draftCards.length + archivedCards.length;
-  document.getElementById('kb-count').textContent=`${total} card${total!==1?'s':''}`;
+  const activeCards  =!showDrafts ?state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='active'  &&!n.is_deleted&&matchQ(n)&&matchFilters(n)):[];
+  const draftCards   = showDrafts  ?state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='draft'   &&!n.is_deleted&&matchQ(n)&&matchFilters(n)):[];
+  const archivedCards= showArchived?state.notes.filter(n=>n.note_type==='KNOWLEDGE_CARD'&&n.status==='archived'&&!n.is_deleted&&matchQ(n)&&matchFilters(n)):[];
 
-  // Build sections
-  const renderCard = c => {
+  const total=activeCards.length+draftCards.length+archivedCards.length;
+  const hasFilters=!!(state.kbFit||state.kbTier||state.kbLens.length||state.kbSector.length||state.kbType.length);
+  document.getElementById('kb-count').textContent=`${total} card${total!==1?'s':''}${hasFilters?' (filtered)':''}`;
+
+  const renderCard=c=>{
     const sd=c.structured_data||{};
     const sel=state.selectedKBId===c.note_id;
+    const tags=sd.kb_tags||{};
+    const quality=sd.kb_quality||{};
+    const tierCol=quality.tier==='A'?'var(--sage)':quality.tier==='B'?'var(--gold)':'var(--muted)';
     return `<div class="kb-card${sel?' selected':''}" tabindex="0" onclick="selectKB('${c.note_id}')" onkeydown="if(event.key==='Enter'||event.key===' ')selectKB('${c.note_id}')">
       <div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap">
         ${badge(c.status==='active'?'◉ Active':c.status==='archived'?'📁 Archived':'◈ Draft',c.status==='active'?'var(--sage-txt)':c.status==='archived'?'var(--faint)':'var(--gold-txt)',c.status==='active'?'var(--sage-dim)':c.status==='archived'?'var(--bg-code)':'var(--gold-dim)')}
+        ${quality.tier?`<span style="font-size:9px;font-family:var(--mono);font-weight:700;color:${tierCol};padding:2px 7px;background:var(--bg-r);border:1px solid ${tierCol};border-radius:3px">Tier ${quality.tier}</span>`:''}
+        ${quality.benelux_fit==='direct'?badge('🎯 direct','var(--sage-txt)','var(--sage-dim)'):''}
         ${c.sector_code?badge(c.sector_code,'var(--faint)','var(--bg-code)'):''}
-        ${confBadge(c.confidence)}
       </div>
       <div class="kb-card-title">${c.title||'(untitled)'}</div>
       <div class="kb-card-excerpt">${truncate(sd.core_insight||c.summary_short||'',110)}</div>
-      ${sd.storage_url?`<div style="margin-top:6px"><span style="font-size:10px;color:var(--brand);font-family:var(--mono);background:var(--bg-code);border:1px solid var(--brand-border);border-radius:3px;padding:2px 6px">📄 doc</span></div>`:''}
-      <div style="display:flex;gap:4px;flex-wrap:wrap">${(sd.best_use||[]).map(u=>pill(u)).join('')}</div>
+      ${sd.storage_url?`<div style="margin-top:6px"><span style="font-size:10px;color:var(--brand);font-family:var(--mono);background:var(--bg-code);border:1px solid var(--border);border-radius:3px;padding:2px 6px">📄 doc</span></div>`:''}
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${(sd.best_use||[]).slice(0,3).map(u=>pill(u)).join('')}</div>
     </div>`;
   };
 
   const grid=document.getElementById('kb-grid');
   if(!total){
-    grid.innerHTML=`<div class="kb-empty"><div style="font-size:28px;margin-bottom:12px">◈</div>No results${q?` for "${q}"`:''}.</div>`;
+    grid.innerHTML=`<div class="kb-empty"><div style="font-size:28px;margin-bottom:12px">◈</div>No results${q?` for "${q}"`:''}${hasFilters?' — try clearing filters':''}.</div>`;
     return;
   }
-
   let html='';
   if(draftCards.length){
     html+=`<div style="font-size:8px;letter-spacing:3px;color:var(--gold);font-family:var(--mono);text-transform:uppercase;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px">◈ Drafts — review &amp; promote</div>`;
@@ -2319,6 +2522,7 @@ function handleUrlParams() {
 // INIT
 // ═══════════════════════════════════════════════════════════════
 renderKB();
+initKBFilters();
 switchTab('today');
 if(KEY){
   loadAll().then(() => handleUrlParams());
