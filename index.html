@@ -450,6 +450,19 @@ nav{padding:14px 0;flex:1;}
           <button class="status-btn"         id="sb-active"   onclick="setCurateFilter('active')">Active    <span class="status-count" id="sc-active">0</span></button>
           <button class="status-btn"         id="sb-archived"   onclick="setCurateFilter('archived')">Archived  <span class="status-count" id="sc-archived">0</span></button>
           <button class="status-btn"         id="sb-candidates" onclick="setCurateFilter('candidates')" style="border-color:var(--gold);color:var(--gold);opacity:.85">◉ Candidates  <span class="status-count" id="sc-candidates">0</span></button>
+          <div style="margin-left:auto;display:flex;gap:5px;align-items:center;">
+            <span style="font-size:9px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;margin-right:2px;">Signal</span>
+            <button class="status-btn active" id="csig-all"    onclick="setCurateSignal('all')">All</button>
+            <button class="status-btn"        id="csig-high"   onclick="setCurateSignal('high')"   style="border-color:var(--red);color:var(--red)">🔴 High</button>
+            <button class="status-btn"        id="csig-medium" onclick="setCurateSignal('medium')" style="border-color:var(--gold);color:var(--gold)">🟡 Medium</button>
+            <button class="status-btn"        id="csig-low"    onclick="setCurateSignal('low')"    style="color:var(--faint)">⚪ Low</button>
+            <div style="width:1px;background:var(--border);margin:0 4px;align-self:stretch;"></div>
+            <span style="font-size:9px;letter-spacing:1.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;margin-right:2px;">Recency</span>
+            <button class="status-btn active" id="crec-all"   onclick="setCurateRecency('all')">All</button>
+            <button class="status-btn"        id="crec-today" onclick="setCurateRecency('today')">Today</button>
+            <button class="status-btn"        id="crec-week"  onclick="setCurateRecency('week')">Week</button>
+            <button class="status-btn"        id="crec-month" onclick="setCurateRecency('month')">Month</button>
+          </div>
         </div>
         <div style="display:flex;flex:1;overflow:hidden;">
           <div class="list-panel" id="curate-list"></div>
@@ -871,6 +884,8 @@ const state = {
   kbTier: null,
   kbFit: null,
   kbCollapsed: new Set(),
+  curateSignal: 'all',
+  curateRecency: 'all',
   selectedKBId: null,
   promoteTargetId: null,
   promoteAudience: 'internal',
@@ -984,6 +999,48 @@ function setCurateFilter(f){
   showCurateEmpty();
 }
 
+function setCurateSignal(v){
+  state.curateSignal=v;
+  ['all','high','medium','low'].forEach(s=>{const b=document.getElementById(`csig-${s}`);if(b)b.classList.toggle('active',s===v);});
+  renderCurateList();
+  showCurateEmpty();
+}
+
+function setCurateRecency(v){
+  state.curateRecency=v;
+  ['all','today','week','month'].forEach(s=>{const b=document.getElementById(`crec-${s}`);if(b)b.classList.toggle('active',s===v);});
+  renderCurateList();
+  showCurateEmpty();
+}
+
+function matchesCurateSignal(n){
+  const v=state.curateSignal;
+  if(v==='all') return true;
+  const score=(n.structured_data||{}).newsworthiness_score||0;
+  const conf=(n.confidence||'').toLowerCase();
+  if(v==='high')   return score>=7||conf==='high';
+  if(v==='medium') return (score>=4&&score<7)||conf==='medium';
+  if(v==='low')    return (score>0&&score<4)||conf==='low';
+  return true;
+}
+
+function matchesCurateRecency(n){
+  const v=state.curateRecency;
+  if(v==='all') return true;
+  const ts=n.created_at;
+  if(!ts) return false;
+  const d=new Date(ts), now=new Date();
+  if(v==='today') return d.toDateString()===now.toDateString();
+  if(v==='week'){
+    const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()||7)-1));mon.setHours(0,0,0,0);
+    return d>=mon;
+  }
+  if(v==='month'){
+    return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+  }
+  return true;
+}
+
 function renderCurateList(){
   const f=state.curateFilter;
   if(f==='candidates'){
@@ -1011,12 +1068,18 @@ function renderCurateList(){
     return;
   }
   const filtered=state.notes.filter(n=>n.status===f);
-  const whispers=filtered.filter(n=>n.note_type==='WHISPER_NOTE');
+  // Signal + Recency sub-filters apply to WHISPER_NOTEs only
+  const whispers=filtered.filter(n=>
+    n.note_type==='WHISPER_NOTE'&&
+    matchesCurateSignal(n)&&
+    matchesCurateRecency(n)
+  );
   const cards=filtered.filter(n=>n.note_type==='KNOWLEDGE_CARD');
   const el=document.getElementById('curate-list');
   let html='';
-  if(!filtered.length){
-    html=`<div class="empty-list">No items in "${f}"</div>`;
+  if(!whispers.length&&!cards.length){
+    const hasSignalFilter=state.curateSignal!=='all'||state.curateRecency!=='all';
+    html=`<div class="empty-list">No items${hasSignalFilter?' matching current filters':` in "${f}"`}</div>`;
   } else {
     if(whispers.length){html+=`<div class="list-section-hdr" style="color:var(--faint)">WHISPERS · ${whispers.length}</div>`;whispers.forEach(n=>html+=listItemHTML(n));}
     if(cards.length){html+=`<div class="list-section-hdr" style="color:var(--blue-txt)">KNOWLEDGE CARDS · ${cards.length}</div>`;cards.forEach(n=>html+=listItemHTML(n));}
