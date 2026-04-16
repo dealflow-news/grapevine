@@ -2445,16 +2445,22 @@ async function ingestAll(){
 // ═══════════════════════════════════════════════════════════════
 
 const LENS_PRESETS = [
-  { id:'distress',     label:'Distress',      keywords:['distress','restructur','debt','insolvenc'] },
-  { id:'succession',   label:'Succession',    keywords:['succession','transition','ownership_change'] },
-  { id:'pe_entry',     label:'PE Entry',      keywords:['pe_entry','buyout','platform','lbo'] },
-  { id:'growth',       label:'Growth Signal', keywords:['growth','expansion','scale','organic'] },
-  { id:'asset_sale',   label:'Asset Sale',    keywords:['asset_sale','carve','divestiture','disposal'] },
-  { id:'founder_exit', label:'Founder Exit',  keywords:['founder','exit','family_business'] },
-  { id:'regulatory',   label:'Regulatory',    keywords:['regulat','compliance','nza','autoriteit','enforcement'] },
-  { id:'cross_border', label:'Cross-Border',  keywords:['cross_border','cross-border','international','foreign','acquisit'] },
-  { id:'roll_up',      label:'Roll-Up',       keywords:['roll_up','roll-up','consolidat','buy_and_build','add-on','add_on'] },
+  { id:'distress',     ml:'ml_sell_side',               label:'Distress',      keywords:['distress','restructur','debt','insolvenc'] },
+  { id:'succession',   ml:'ml_succession',              label:'Succession',    keywords:['succession','transition','ownership_change'] },
+  { id:'pe_entry',     ml:'ml_pe_investing',            label:'PE Entry',      keywords:['pe_entry','buyout','platform','lbo'] },
+  { id:'growth',       ml:'ml_growth_capital',          label:'Growth Signal', keywords:['growth','expansion','scale','organic'] },
+  { id:'asset_sale',   ml:'ml_carveout',                label:'Asset Sale',    keywords:['asset_sale','carve','divestiture','disposal'] },
+  { id:'founder_exit', ml:'ml_mbo_mbi',                 label:'Founder Exit',  keywords:['founder','exit','family_business'] },
+  { id:'regulatory',   ml:'ml_process_execution',       label:'Regulatory',    keywords:['regulat','compliance','nza','autoriteit','enforcement'] },
+  { id:'cross_border', ml:'ml_partnerships_jv',         label:'Cross-Border',  keywords:['cross_border','cross-border','international','foreign','acquisit'] },
+  { id:'roll_up',      ml:'ml_post_merger_integration', label:'Roll-Up',       keywords:['roll_up','roll-up','consolidat','buy_and_build','add-on','add_on'] },
 ];
+
+// Find a LENS_PRESET by either short id ('succession') or ml_* taxonomy code ('ml_succession')
+function findLensPreset(code){
+  if(!code) return null;
+  return LENS_PRESETS.find(l=>l.id===code||l.ml===code)||null;
+}
 
 function isThisWeek(ts){
   if(!ts)return false;
@@ -2742,13 +2748,17 @@ function renderTodayBeats(){
   const whispers=state.notes.filter(n=>n.note_type==='WHISPER_NOTE'&&!n.is_deleted&&n.status==='active');
   const thisWeekW=whispers.filter(n=>isThisWeek(n.created_at));
   el.innerHTML=state.beats.map(b=>{
-    const lensPreset=LENS_PRESETS.find(l=>l.id===b.lens_code);
+    const lensPreset=findLensPreset(b.lens_code);
+    // geo_scope is a text[] from Supabase — normalise to array of upper-case strings
+    const geoScope=(Array.isArray(b.geo_scope)?b.geo_scope:
+                   (b.geo_scope?String(b.geo_scope).split(','):[])).map(g=>g.trim().toUpperCase()).filter(Boolean);
     const matchBeat=n=>{
-      const geo=(b.geo_code||'').toUpperCase();
-      const geoOk=!geo||(geo==='BENELUX'
-        ?['BE','NL','LU','FR','BENELUX'].includes((n.geo_country||'').toUpperCase())
-        :(n.geo_country||'').toUpperCase()===geo);
-      const sectorOk=!b.sector_code||(n.sector_code||'')===(b.sector_code||'');
+      const nGeo=(n.geo_country||'').toUpperCase();
+      const geoOk=!geoScope.length||geoScope.some(g=>
+        g==='BENELUX'?['BE','NL','LU','FR','FR_N'].includes(nGeo):g===nGeo
+      );
+      const sectors=Array.isArray(b.sector_codes)?b.sector_codes:(b.sector_codes?[b.sector_codes]:[]);
+      const sectorOk=!sectors.length||sectors.includes(n.sector_code||'');
       const lensOk=!lensPreset||noteMatchesLens(n,lensPreset);
       return geoOk&&sectorOk&&lensOk;
     };
@@ -2758,7 +2768,7 @@ function renderTodayBeats(){
     return `<div class="beat-item">
       <span class="beat-label">${b.label}</span>
       <span class="beat-count" style="color:${col}">${total}</span>
-      ${newW>0?`<span class="beat-trend">+${newW}↑</span>`:'<span style="font-size:9px;color:var(--border-act);font-family:var(--mono)">—</span>'}
+      ${newW>0?`<span class="beat-trend">+${newW}↑</span>`:'<span style="font-size:9px;color:var(--faint);font-family:var(--mono)">—</span>'}
     </div>`;
   }).join('');
 }
@@ -2780,7 +2790,7 @@ function renderTodayWatches(){
     active:        {label:'Active',        col:'var(--sage-txt)',  bg:'var(--sage-dim)'},
   };
   el.innerHTML=state.watches.map(w=>{
-    const lensPreset=LENS_PRESETS.find(l=>l.id===w.lens_code);
+    const lensPreset=findLensPreset(w.lens_code);
     const sigCount=whispers.filter(n=>{
       const lensOk=!lensPreset||noteMatchesLens(n,lensPreset);
       const sectorOk=!(w.sector_codes||[]).length||(w.sector_codes||[]).includes(n.sector_code||'');
@@ -2806,7 +2816,7 @@ function renderTodayProspects(){
   }
   const whispers=state.notes.filter(n=>n.note_type==='WHISPER_NOTE'&&!n.is_deleted&&n.status==='active');
   el.innerHTML=state.prospects.map(p=>{
-    const lensPreset=LENS_PRESETS.find(l=>l.id===p.lens_code);
+    const lensPreset=findLensPreset(p.lens_code);
     const sigCount=whispers.filter(n=>{
       const lensOk=!lensPreset||noteMatchesLens(n,lensPreset);
       const sectorOk=!(p.sector_codes||[]).length||(p.sector_codes||[]).includes(n.sector_code||'');
@@ -2938,17 +2948,21 @@ function renderTodayPatterns(){
   const whispers=state.notes.filter(n=>n.note_type==='WHISPER_NOTE'&&n.status==='active'&&!n.is_deleted);
   const map={};
   whispers.forEach(n=>{
-    // Primary: sector_code (always present on whispers) — gives most useful grouping
     const sec=n.sector_code;
-    if(sec){const k=`§ ${sec}`;map[k]=(map[k]||0)+1;}
-    // Secondary: library_domain from kb_tags (only on KCs, rarely on whispers — bonus signal)
+    if(sec) map[sec]=(map[sec]||0)+1;
+    // Fallback: group by geo when sector absent — shows geographic convergence
+    else if(n.geo_country){const k=`${n.geo_country}`;map[k]=(map[k]||0)+1;}
+    // Also track library_domain as a bonus signal
     const domain=((n.structured_data||{}).kb_tags||{}).library_domain;
-    if(domain&&domain!=='ld_insights_library'){map[domain]=(map[domain]||0)+1;}
+    if(domain&&domain!=='ld_insights_library') map[domain]=(map[domain]||0)+1;
   });
-  const items=Object.entries(map).filter(([,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,4);
-  if(!items.length){el.innerHTML='<div style="color:var(--faint);font-size:11px;font-family:var(--mono)">No convergence patterns yet — promote more signals to active</div>';return;}
+  const items=Object.entries(map).filter(([,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(!items.length){
+    el.innerHTML='<div style="color:var(--faint);font-size:11px;font-family:var(--mono)">No convergence yet — signals need sector codes or geo tagging</div>';
+    return;
+  }
   el.innerHTML=items.map(([key,count])=>{
-    const label=key.startsWith('§')?key.replace('§ ',''):key.replace(/^ld_/,'').replace(/_/g,' ');
+    const label=key.startsWith('ld_')?key.replace(/^ld_/,'').replace(/_/g,' '):key;
     return `<div class="today-pattern-item">
       <span style="font-size:12px;color:var(--txt2);text-transform:capitalize">${label}</span>
       <span class="today-pattern-count">${count} signals</span>
