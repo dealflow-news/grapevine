@@ -11,7 +11,7 @@ This repo is one of four in the V4G stack. Per the V4G Intelligence Platform Roa
 | golden-safe-repo | Canonical truth layer, schema, governance doctrine |
 | ticker-dealflow | Focus Terminal — publication + intake pipeline |
 | **grapevine-repo (this)** | **Editorial OS — curation, knowledge cards, briefings** |
-| v4g-ingestion | Heavy ingestion pipeline (NBB/KBO/PB) |
+| v4g-ingestion | Heavy ingestion (NBB financials, W8 worker) + WB-v4 Workbench engine |
 
 Companion documentation (in V4G doc system, not in this repo):
 - `01_V4G_Intelligence_Platform_Roadmap_v1_1.docx` — phase status, 3-layer classification model (Sector/Theme/Thesis), governance rules
@@ -19,7 +19,7 @@ Companion documentation (in V4G doc system, not in this repo):
 
 Note: this repo introduces its OWN three-layer model (S1/S2/S3 + BB) for UI/UX concerns. That is a different abstraction than the Roadmap's classification layers or the ADR's ETL layers — see "Architecture" below.
 
-For platform doctrine and conventions across all four repos: see `../golden-safe-repo/CLAUDE.md`. For the authoritative schema dictionary: `../golden-safe-repo/exports/golden_safe/golden_safe_dictionary_v6.md`.
+For platform doctrine and conventions across all four repos: see `../golden-safe-repo/CLAUDE.md`. For the authoritative schema dictionary: the newest `golden_safe_dictionary_v*.md` in `../golden-safe-repo/exports/golden_safe/` (this repo is a **consumer** — the version-pin discipline lives in golden-safe, not here; Chris's ruling 2026-07-19).
 
 ## What Grapevine is
 
@@ -188,3 +188,4 @@ Hard constraints that have come up:
 Bump version + add changelog entry when canonical objects, governance rules, or shell boundaries change. Schema dictionary and platform doctrine changes live in `../golden-safe-repo/` — reference them, don't duplicate.
 
 - v1.0 · 2026-05-21 — initial via /init + V4G platform integration
+- v1.1 · 2026-07-19 — platform-reference refresh: versionless dictionary ref (consumer repos never pin — Chris's ruling); v4g cross-repo role updated to its two pillars incl. WB-v4 Workbench engine
