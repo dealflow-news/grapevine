@@ -20,6 +20,7 @@ Usage:
 """
 
 import os, sys, json, re, textwrap, time
+from focus_intake import intake as focus_intake, qualify_draft, metadata as focus_metadata
 # Windows cp1252 fix
 if hasattr(sys.stdout, 'reconfigure'): sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 if hasattr(sys.stderr, 'reconfigure'): sys.stderr.reconfigure(encoding='utf-8', errors='replace')
@@ -434,6 +435,10 @@ def fetch_intel_items():
             'source_ref_type': 'eq.mi_id',
         }) or []
         for n in existing:
+            receipt=focus_metadata(n.get('structured_data')).get('focus_intake_v1',{})
+            if n.get('body_md') and receipt.get('input_fingerprint')==focus_intake(item)['input_fingerprint']:
+                print('  Exact source replay — retained original')
+                return []
             sd = n.get('structured_data') or {}
             if isinstance(sd, str):
                 try: sd = json.loads(sd)
@@ -534,7 +539,10 @@ def fetch_intel_items():
         }) or []
 
         # Fully enriched (has body_md) → skip entirely
-        already_enriched = {n['source_ref_id'] for n in existing_notes if n.get('body_md')}
+        fingerprints={r['mi_id']:focus_intake(r)['input_fingerprint'] for r in items}
+        already_enriched = {n['source_ref_id'] for n in existing_notes if n.get('body_md')
+            and (focus_metadata(n.get('structured_data')).get('focus_intake_v1',{}).get('input_fingerprint')
+                 in (None,fingerprints.get(n['source_ref_id'])))}
 
         # Minimal notes (no body_md) → extract hints, mark for replacement after enrichment
         # NOTE: notes with body (editorial hints) but no body_md are also treated as minimal
@@ -602,7 +610,7 @@ def build_grapevine_note(mi_row, parsed):
 
     source_type = _derive_source_type(payload)
 
-    return {
+    note = {
         # ── Content ──────────────────────────────────────────────────────────
         'body':               parsed['body_md'],   # legacy NOT NULL column — keep
         'note_type':          'WHISPER_NOTE',      # spec v2.2: canonical enum value
@@ -661,6 +669,8 @@ def build_grapevine_note(mi_row, parsed):
         'layer_scope':        'grapevine',
         'confidentiality_tier': 'internal',
     }
+    return qualify_draft(note,mi_row)
+
 
 # ── Newsworthiness scoring ──────────────────────────────────────────────────
 SCORE_SYSTEM = """You are an editorial scoring engine for a Benelux M&A newsletter.
@@ -831,22 +841,7 @@ def run():
                 note = build_grapevine_note(item, parsed)
                 sb_post('grapevine_notes', note)
 
-                # Archive minimal note if it existed (bookmark/quicksave → replaced by enriched)
-                replace_id = item.get('_replace_note_id')
-                if replace_id:
-                    try:
-                        sb_patch('grapevine_notes',
-                                 {'note_id': f'eq.{replace_id}'},
-                                 {'status': 'archived'})
-                        print(f"          + Minimal note archived (replaced by enriched version)")
-                    except Exception as de:
-                        print(f"          ! Could not archive minimal note: {de}")
-
-                # Mark intel item as handled
-                ok = sb_patch('market_intelligence',
-                              {'mi_id': f'eq.{item["mi_id"]}'},
-                              {'status': 'handled_intel_capture'})
-                print(f"          + Grapevine note created (draft) · mi patched: {ok}")
+                # Processing receipt lives on the new draft; original statuses stay intact.
                 notes_written += 1
 
         except Exception as e:
@@ -1003,6 +998,7 @@ def run_to_card(note_id):
         'usable_for':   ['thought_leadership', 'sector_research'],
     }
 
+    card=qualify_draft(card,source)
     # 4. Write to DB
     print(f"\n[3] Writing KNOWLEDGE_CARD to grapevine_notes…")
     try:
