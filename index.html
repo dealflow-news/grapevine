@@ -2393,7 +2393,7 @@ async function ingestAll(){
       // Compute content fingerprint for text items
       let contentHash=null;
       if(q.text){
-        const normalized=q.text.slice(0,2000).toLowerCase().replace(/\s+/g,' ').trim();
+        const normalized=q.text;
         contentHash=await sha256(normalized);
       }
       const note={
@@ -2411,6 +2411,8 @@ async function ingestAll(){
         sector_code:      q.sector||null,
         geo_country:      q.country||null,
         title:            q.title,
+        body:             q.text||q.title,
+        source_url:       q.url||null,
         body_md:          q.text||null,
         summary_short:    q.text?q.text.slice(0,300):null,
         language_code:    'en',
@@ -2422,6 +2424,7 @@ async function ingestAll(){
         file_checksum:        q.file_hash||null,
         content_fingerprint_hash: contentHash,
         structured_data:{
+          focus_intake_v1:{contract:'focus-intake/1',intent:'note',kind_hint:q.note_type==='KNOWLEDGE_CARD'?(q.time_sensitivity==='TIMELESS'?'knowledge_method':'thematic_analysis'):'unclassified',claim_support:'unverified',original_text:q.text||q.title,source_url:q.url||null,event_date:null,publication_date:null},
           source_box: q.url||q.source||null,
           source_language: 'en',
           drop_source: q.source||null,
