@@ -20,6 +20,7 @@ Usage:
 """
 
 import os, sys, json, re, textwrap, time
+from capture_queue import intake_window, linked_notes
 from focus_intake import intake as focus_intake, qualify_draft, metadata as focus_metadata
 # Windows cp1252 fix
 if hasattr(sys.stdout, 'reconfigure'): sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -470,44 +471,8 @@ def fetch_intel_items():
     # ── Normal fetch (no TARGET_MI_ID) ────────────────────────────────────
     since = (datetime.now(timezone.utc) - timedelta(days=7)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    # Fetch items in two groups:
-    # 1. Analyst-touched (handled_curated, handled_quicksave) — process immediately
-    # 2. Open items older than 4h — analyst had time to decide, auto-process as backlog
     grace_cutoff = (datetime.now(timezone.utc) - timedelta(hours=4)).strftime('%Y-%m-%dT%H:%M:%SZ')
-
-    params_curated = {
-        'select': 'mi_id,scope,payload,period_start,generated_by,status',
-        'period_type': 'neq.run',
-        'status': 'in.(handled_curated,handled_quicksave)',
-        'created_at': f'gte.{since}',
-        'limit': str(LIMIT * 3),
-    }
-    params_open = {
-        'select': 'mi_id,scope,payload,period_start,generated_by,status',
-        'period_type': 'neq.run',
-        'status': 'eq.open',
-        'created_at': f'gte.{since}',
-        'created_at2': f'lte.{grace_cutoff}',  # only old enough open items
-        'limit': str(LIMIT * 3),
-    }
-
-    # Note: PostgREST doesn't support two filters on same column via params dict
-    # Use a single query with OR logic isn't available — use two fetches and merge
-    rows_curated = sb_get('market_intelligence', params_curated) or []
-    # For open items: filter by created_at <= grace_cutoff (older than 4h)
-    params_open_fixed = {
-        'select': 'mi_id,scope,payload,period_start,generated_by,status',
-        'period_type': 'neq.run',
-        'status': 'eq.open',
-        'created_at': f'gte.{since}',
-        'order': 'period_start.desc',
-        'limit': str(LIMIT * 3),
-    }
-    rows_open_all = sb_get('market_intelligence', params_open_fixed) or []
-    # Keep only open items older than 4h (analyst grace period)
-    rows_open = [r for r in rows_open_all
-                 if r.get('created_at','') <= grace_cutoff]
-    rows = rows_curated + rows_open
+    rows = intake_window(sb_get, since, grace_cutoff)
 
     # Filter: must have a headline, not a run_metrics row
     items = []
@@ -532,11 +497,7 @@ def fetch_intel_items():
     # Check for existing notes (bookmark/quicksave = minimal; enriched = has body_md)
     if items and not TARGET_MI_ID:
         mi_ids = [r['mi_id'] for r in items]
-        existing_notes = sb_get('grapevine_notes', {
-            'select': 'note_id,source_ref_id,structured_data,title,body_md',
-            'source_ref_type': 'eq.mi_id',
-            'source_ref_id': f'in.({",".join(mi_ids)})',
-        }) or []
+        existing_notes = linked_notes(sb_get, mi_ids)
 
         # Fully enriched (has body_md) → skip entirely
         fingerprints={r['mi_id']:focus_intake(r)['input_fingerprint'] for r in items}
